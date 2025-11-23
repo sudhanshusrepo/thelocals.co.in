@@ -9,6 +9,7 @@ import { ReviewStep } from './components/steps/ReviewStep';
 import { ProviderProfile, RegistrationStatus, DocType } from './types';
 import { backend } from './services/backend';
 import { ToastProvider, useToast } from './components/Toast';
+import { AuthProvider } from './contexts/AuthContext';
 
 const initialData: ProviderProfile = {
   phoneNumber: '',
@@ -127,8 +128,10 @@ const MainApp = () => {
 
 export default function App() {
     return (
-        <ToastProvider>
-            <MainApp />
-        </ToastProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <MainApp />
+        </AuthProvider>
+      </ToastProvider>
     );
 }

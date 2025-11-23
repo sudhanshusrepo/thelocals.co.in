@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StepProps } from '../../types';
 import { Button } from '../Button';
 import { Input } from '../Input';
-import { backend } from '../../services/backend';
 import { useToast } from '../Toast';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => {
   const [phone, setPhone] = useState(data.phoneNumber);
@@ -12,6 +12,7 @@ export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => 
   const [timer, setTimer] = useState(0);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+  const { signInWithPhone, verifyOtp } = useAuth();
 
   useEffect(() => {
     let interval: number;
@@ -28,12 +29,12 @@ export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => 
     }
     setLoading(true);
     try {
-        const { error } = await backend.auth.signInWithOtp(phone);
+        const { error } = await signInWithPhone(phone);
         if (error) throw error;
         
         setOtpSent(true);
         setTimer(30);
-        toast.success("OTP sent successfully. Use 1234.");
+        toast.success("OTP sent successfully.");
     } catch (err: any) {
         toast.error(err.message || "Failed to send OTP.");
     } finally {
@@ -45,7 +46,7 @@ export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => 
     if (otp.length !== 4) return;
     setLoading(true);
     try {
-        const { error } = await backend.auth.verifyOtp(phone, otp);
+        const { error } = await verifyOtp(phone, otp);
         if (error) throw error;
 
         updateData({ phoneNumber: phone, isPhoneVerified: true });

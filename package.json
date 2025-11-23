@@ -8,13 +8,15 @@
     "dev:client": "npm run dev --workspace=packages/client",
     "dev:provider": "npm run dev --workspace=packages/provider",
     "build:client": "npm run build --workspace=packages/client",
-    "build:provider": "npm run build --workspace=packages/provider"
+    "build:provider": "npm run build --workspace=packages/provider",
+    "build": "npm run build:client && npm run build:provider"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@supabase/gotrue-js": "^2.84.0",
     "@supabase/supabase-js": "^2.84.0"
   }
 }
