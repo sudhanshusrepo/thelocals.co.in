@@ -25,7 +25,7 @@ export const bookingService = {
       .from('bookings')
       .select(`
         *,
-        worker:workers(*)
+        workers(*)
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });

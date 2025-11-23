@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { SearchIntent, WorkerCategory } from "../types";
 
 // Helper to safely get API key
-const getApiKey = () => process.env.API_KEY || '';
+const getApiKey = () => import.meta.env.VITE_GEMINI_API_KEY || '';
 
 export const interpretSearchQuery = async (query: string): Promise<SearchIntent> => {
   try {
