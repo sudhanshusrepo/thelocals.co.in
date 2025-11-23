@@ -9,7 +9,7 @@
     "dev:provider": "npm run dev --workspace=packages/provider",
     "build:client": "npm run build --workspace=packages/client",
     "build:provider": "npm run build --workspace=packages/provider",
-    "build": "npm run build:client && npm run build:provider"
+    "build": "npm run build:client"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
