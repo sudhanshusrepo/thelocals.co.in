@@ -10,10 +10,8 @@ export const bookingService = {
         worker_id: workerId,
         user_id: userId,
         status: 'pending',
-        payment_status: 'pending',
         note: note,
         total_price: price,
-        date: new Date().toISOString()
       })
       .select()
       .single();
