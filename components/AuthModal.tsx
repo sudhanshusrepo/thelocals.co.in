@@ -52,7 +52,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
         alert('Check your email for the confirmation link!');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      const errorMessage = err.message || '';
+      if (errorMessage.includes('violates row-level security policy') || 
+          errorMessage.includes('User already registered') ||
+          errorMessage.includes('duplicate key value violates unique constraint')) {
+        setError('A user with this email already exists.');
+      } else {
+        setError(errorMessage || 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }
