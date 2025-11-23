@@ -10,6 +10,7 @@ import { CATEGORY_ICONS, ICONS, DEFAULT_CENTER } from './constants';
 import { WorkerCategory, WorkerProfile, Coordinates } from './types';
 import { interpretSearchQuery } from './services/geminiService';
 import { workerService } from './services/workerService';
+import { databaseService } from './services/databaseService';
 
 // Haversine formula for distance
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -51,6 +52,10 @@ const MainLayout: React.FC = () => {
         setSearchResults(workers); // Default to showing all until filtered
     };
     initData();
+
+    // Run database migrations
+    databaseService.setupNewUserTrigger();
+    databaseService.removeInsertPolicy();
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(

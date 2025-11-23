@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
-import { customerService } from '../services/customerService';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -39,27 +38,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
         });
 
         if (signUpError) throw signUpError;
-        
-        if (signUpData.user) {
-            await customerService.createCustomer({
-                id: signUpData.user.id,
-                full_name: fullName,
-                email: email,
-            });
-        }
 
         onClose(); 
         alert('Check your email for the confirmation link!');
       }
     } catch (err: any) {
-      const errorMessage = err.message || '';
-      if (errorMessage.includes('violates row-level security policy') || 
-          errorMessage.includes('User already registered') ||
-          errorMessage.includes('duplicate key value violates unique constraint')) {
-        setError('A user with this email already exists.');
-      } else {
-        setError(errorMessage || 'An error occurred');
-      }
+        setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -126,7 +110,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                         type="password" 
                         required
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.targe.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         placeholder="••••••••"
                         minLength={6}
