@@ -72,3 +72,10 @@ export interface Coordinates {
   lat: number;
   lng: number;
 }
+
+export interface CustomerProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+}

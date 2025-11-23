@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
+import { customerService } from '../services/customerService';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -27,7 +28,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
         if (error) throw error;
         onClose();
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -36,9 +37,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             },
           },
         });
-        if (error) throw error;
-        // For email confirmation flows, usually you'd show a message here.
-        // Assuming auto-confirm or just closing for now, or showing a "Check email" message.
+
+        if (signUpError) throw signUpError;
+        
+        if (signUpData.user) {
+            await customerService.createCustomer({
+                id: signUpData.user.id,
+                full_name: fullName,
+                email: email,
+            });
+        }
+
         onClose(); 
         alert('Check your email for the confirmation link!');
       }
