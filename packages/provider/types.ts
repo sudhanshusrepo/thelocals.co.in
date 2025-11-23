@@ -4,6 +4,13 @@ export enum DocType {
     Selfie = 'Selfie',
 }
 
+export enum RegistrationStatus {
+    Incomplete = 'incomplete',
+    Pending = 'pending',
+    Approved = 'approved',
+    Rejected = 'rejected',
+}
+
 export interface ProviderDocument {
     type: DocType;
     status: 'empty' | 'uploading' | 'analyzing' | 'verified' | 'error' | 'uploaded';
@@ -26,6 +33,7 @@ export interface OnboardingData {
     idNumber?: string;
     selfie?: string;
     isAgreedToTerms?: boolean;
+    registrationStatus?: RegistrationStatus;
     documents: {
         [key in DocType]: ProviderDocument;
     };
