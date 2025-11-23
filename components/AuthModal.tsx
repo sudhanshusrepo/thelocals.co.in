@@ -110,7 +110,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                         type="password" 
                         required
                         value={password}
-                        onChange={(e) => setPassword(e.targe.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         placeholder="••••••••"
                         minLength={6}
