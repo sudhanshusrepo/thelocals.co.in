@@ -13,5 +13,8 @@
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.84.0"
   }
 }
