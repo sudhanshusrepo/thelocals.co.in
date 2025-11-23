@@ -36,7 +36,12 @@ export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => 
         setTimer(30);
         toast.success("OTP sent successfully.");
     } catch (err: any) {
-        toast.error(err.message || "Failed to send OTP.");
+        console.error("OTP Send Error:", err); // For debugging
+        if (err.message && err.message.includes("not supported")) {
+            toast.error("Phone sign-up is currently unavailable. Please try again later.");
+        } else {
+            toast.error("Failed to send OTP. Please check the number and try again.");
+        }
     } finally {
         setLoading(false);
     }
@@ -53,7 +58,14 @@ export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => 
         toast.success("Phone verified successfully!");
         onNext();
     } catch (err: any) {
-        toast.error(err.message || "Invalid OTP.");
+        console.error("OTP Verify Error:", err); // For debugging
+        if (err.message && (err.message.includes("Invalid OTP") || err.message.includes("token has invalid format"))) {
+            toast.error("The OTP you entered is incorrect. Please try again.");
+        } else if (err.message && err.message.includes("expired")) {
+            toast.error("The OTP has expired. Please request a new one.");
+        } else {
+            toast.error("Failed to verify OTP. Please try again.");
+        }
     } finally {
         setLoading(false);
     }
