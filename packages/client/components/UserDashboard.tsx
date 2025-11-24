@@ -1,20 +1,26 @@
+
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/supabase';
 import { bookingService } from '../services/bookingService';
 import { Booking, BookingStatus } from '../types';
-import { supabase } from '../services/supabase';
 import { ReviewModal } from './ReviewModal';
 import { PaymentModal } from './PaymentModal';
+import { Profile } from './Profile';
+import { TermsAndConditions } from './TermsAndConditions';
+import { Support } from './Support';
+import { User } from '@supabase/supabase-js';
 
+type View = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Support';
 type Tab = 'Upcoming' | 'Active' | 'Past';
 
 export const UserDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('Upcoming');
+  const [activeView, setActiveView] = useState<View>('Bookings');
 
   const fetchBookings = async () => {
     if (!user) return;
@@ -29,28 +35,38 @@ export const UserDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchBookings();
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    fetchUser();
+  }, []);
 
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'bookings',
-        },
-        (payload) => {
-           setBookings((current) => 
-             current.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b)
-           );
-        }
-      )
-      .subscribe();
+  useEffect(() => {
+    if (user) {
+        fetchBookings();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+        const channel = supabase
+        .channel('schema-db-changes')
+        .on(
+            'postgres_changes',
+            {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'bookings',
+            },
+            (payload) => {
+            setBookings((current) => 
+                current.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b)
+            );
+            }
+        )
+        .subscribe();
+
+        return () => {
+        supabase.removeChannel(channel);
+        };
+    }
   }, [user]);
   
   const upcomingBookings = bookings.filter(b => b.status === 'confirmed');
@@ -80,24 +96,41 @@ export const UserDashboard: React.FC = () => {
   if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading dashboard...</div>;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-20 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Requests</h2>
-        <div className="text-sm text-gray-500 dark:text-gray-400">Live Updates Active <span className="inline-block w-2 h-2 bg-green-500 rounded-full ml-1 animate-pulse"></span></div>
-      </div>
+    <div className="max-w-4xl mx-auto flex space-x-8 pb-20 animate-fade-in">
+      <nav className="w-1/4 space-y-2">
+          <NavItem view="Bookings" activeView={activeView} setActiveView={setActiveView} />
+          <NavItem view="Profile" activeView={activeView} setActiveView={setActiveView} />
+          <NavItem view="Terms & Conditions" activeView={activeView} setActiveView={setActiveView} />
+          <NavItem view="Support" activeView={activeView} setActiveView={setActiveView} />
+      </nav>
 
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-          <TabButton title="Upcoming" count={upcomingBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton title="Active" count={activeBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton title="Past" count={pastBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-        </nav>
-      </div>
+      <div className="w-3/4">
+        {activeView === 'Bookings' && (
+            <div>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Requests</h2>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Live Updates Active <span className="inline-block w-2 h-2 bg-green-500 rounded-full ml-1 animate-pulse"></span></div>
+                </div>
 
-      <div className="mt-6">
-        {activeTab === 'Upcoming' && renderBookings(upcomingBookings)}
-        {activeTab === 'Active' && renderBookings(activeBookings)}
-        {activeTab === 'Past' && renderBookings(pastBookings)}
+                <div className="border-b border-gray-200 dark:border-gray-700 mt-4">
+                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <TabButton title="Upcoming" count={upcomingBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <TabButton title="Active" count={activeBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <TabButton title="Past" count={pastBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                    </nav>
+                </div>
+
+                <div className="mt-6">
+                    {activeTab === 'Upcoming' && renderBookings(upcomingBookings)}
+                    {activeTab === 'Active' && renderBookings(activeBookings)}
+                    {activeTab === 'Past' && renderBookings(pastBookings)}
+                </div>
+            </div>
+        )}
+
+        {activeView === 'Profile' && <Profile />}
+        {activeView === 'Terms & Conditions' && <TermsAndConditions />}
+        {activeView === 'Support' && <Support />}
       </div>
 
       {paymentBooking && (
@@ -119,6 +152,21 @@ export const UserDashboard: React.FC = () => {
   );
 };
 
+const NavItem: React.FC<{view: View, activeView: View, setActiveView: (view: View) => void}> = ({ view, activeView, setActiveView }) => {
+    const isActive = activeView === view;
+    return (
+        <button
+            onClick={() => setActiveView(view)}
+            className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+            }`}>
+            {view}
+        </button>
+    )
+}
+
 // Sub-components for clarity
 
 const TabButton: React.FC<{title: Tab, count: number, activeTab: Tab, setActiveTab: (tab: Tab) => void}> = ({ title, count, activeTab, setActiveTab }) => {
@@ -127,9 +175,10 @@ const TabButton: React.FC<{title: Tab, count: number, activeTab: Tab, setActiveT
         <button
           onClick={() => setActiveTab(title)}
           className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
-            ${isActive
-              ? 'border-indigo-500 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            ${
+              isActive
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`
           }
         >
