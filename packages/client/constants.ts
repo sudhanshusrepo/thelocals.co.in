@@ -23,8 +23,52 @@ export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
   [WorkerCategory.TEACHER]: "📚",
   [WorkerCategory.TRAINER]: "💪",
   [WorkerCategory.DRIVER]: "🚖",
+  [WorkerCategory.CAR_WASHING]: '🧼',
+  [WorkerCategory.DOCTOR_NURSE]: '🧑‍⚕️',
+  [WorkerCategory.TIFFIN_SERVICE]: '🍱',
+  [WorkerCategory.ERRAND_RUNNER]: '🏃‍♂️',
   [WorkerCategory.OTHER]: "🔍",
 };
+
+type ServiceGroup = {
+    name: string;
+    color: string;
+    icon: string;
+    categories: WorkerCategory[];
+}
+
+export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
+  "Home Help": {
+    name: "Home Help",
+    icon: "🏠",
+    color: "blue",
+    categories: [WorkerCategory.MAID, WorkerCategory.GARDENER, WorkerCategory.PAINTER]
+  },
+  "Repairs & Maintenance": {
+    name: "Repairs & Maintenance",
+    icon: "🛠️",
+    color: "green",
+    categories: [WorkerCategory.ELECTRICIAN, WorkerCategory.PLUMBER, WorkerCategory.AC_REPAIR, WorkerCategory.CARPENTER]
+  },
+  "Vehicle Help": {
+    name: "Vehicle Help",
+    icon: "🚗",
+    color: "red",
+    categories: [WorkerCategory.MECHANIC, WorkerCategory.DRIVER, WorkerCategory.CAR_WASHING]
+  },
+  "Personal Services": {
+    name: "Personal Services",
+    icon: "🤝",
+    color: "purple",
+    categories: [WorkerCategory.TEACHER, WorkerCategory.TRAINER, WorkerCategory.DOCTOR_NURSE, WorkerCategory.TIFFIN_SERVICE]
+  },
+  "Other Essentials": {
+    name: "Other Essentials",
+    icon: "📦",
+    color: "gray",
+    categories: [WorkerCategory.ERRAND_RUNNER, WorkerCategory.OTHER]
+  }
+}
 
 // Helper to generate random coordinates near a base location (approx 10km radius)
 const randomNear = (lat: number, lng: number) => {
@@ -245,6 +289,70 @@ export const MOCK_WORKERS: WorkerProfile[] = [
     imageUrl: "https://picsum.photos/200/200?random=13",
     location: randomNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
     isVerified: true,
+    status: 'AVAILABLE'
+  },
+  {
+    id: '14',
+    name: "Squeaky Clean",
+    category: WorkerCategory.CAR_WASHING,
+    rating: 4.9,
+    reviewCount: 150,
+    price: 25,
+    priceUnit: 'service',
+    experienceYears: 5,
+    expertise: ["Interior Detailing", "Exterior Waxing", "Mobile Service"],
+    description: "We come to you and make your car shine like new.",
+    imageUrl: "https://picsum.photos/200/200?random=14",
+    location: randomNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+    isVerified: true,
+    status: 'AVAILABLE'
+  },
+  {
+    id: '15',
+    name: "Nurse Nancy",
+    category: WorkerCategory.DOCTOR_NURSE,
+    rating: 5.0,
+    reviewCount: 30,
+    price: 100,
+    priceUnit: 'hr',
+    experienceYears: 20,
+    expertise: ["Elderly Care", "Post-operative Care", "Checkups"],
+    description: "Registered nurse providing in-home care with compassion.",
+    imageUrl: "https://picsum.photos/200/200?random=15",
+    location: randomNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+    isVerified: true,
+    status: 'BUSY'
+  },
+  {
+    id: '16',
+    name: "Mom's Kitchen",
+    category: WorkerCategory.TIFFIN_SERVICE,
+    rating: 4.7,
+    reviewCount: 201,
+    price: 15,
+    priceUnit: 'visit',
+    experienceYears: 8,
+    expertise: ["North Indian", "South Indian", "Healthy Options"],
+    description: "Delicious and healthy homemade meals delivered to your doorstep.",
+    imageUrl: "https://picsum.photos/200/200?random=16",
+    location: randomNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+    isVerified: true,
+    status: 'AVAILABLE'
+  },
+  {
+    id: '17',
+    name: "GoGetIt",
+    category: WorkerCategory.ERRAND_RUNNER,
+    rating: 4.8,
+    reviewCount: 75,
+    price: 20,
+    priceUnit: 'hr',
+    experienceYears: 3,
+    expertise: ["Grocery Shopping", "Dry Cleaning Pickup", "Package Delivery"],
+    description: "Your personal assistant for all your daily errands. Fast and reliable.",
+    imageUrl: "https://picsum.photos/200/200?random=17",
+    location: randomNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+    isVerified: false,
     status: 'AVAILABLE'
   }
 ];

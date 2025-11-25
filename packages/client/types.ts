@@ -9,8 +9,12 @@ export enum WorkerCategory {
   AC_REPAIR = 'AC Repair',
   GARDENER = 'Gardener',
   TEACHER = 'Tutor',
-  TRAINER = 'Trainer',
+  TRAINER = 'Personal Trainer',
   DRIVER = 'Driver',
+  CAR_WASHING = 'Car Washing',
+  DOCTOR_NURSE = 'Doctor/Nurse',
+  TIFFIN_SERVICE = 'Tiffin Service',
+  ERRAND_RUNNER = 'Errand Runner',
   OTHER = 'Other'
 }
 

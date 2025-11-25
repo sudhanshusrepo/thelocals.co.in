@@ -5,7 +5,7 @@ import { BookingModal } from './components/BookingModal';
 import { AuthModal } from './components/AuthModal';
 import { UserDashboard } from './components/UserDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { CATEGORY_ICONS, ICONS, DEFAULT_CENTER } from './constants';
+import { CATEGORY_ICONS, ICONS, DEFAULT_CENTER, SERVICE_GROUPS } from './constants';
 import { WorkerCategory, WorkerProfile, Coordinates } from './types';
 import { interpretSearchQuery } from './services/geminiService';
 import { workerService } from './services/workerService';
@@ -29,12 +29,13 @@ function deg2rad(deg: number) {
 }
 
 const MainLayout: React.FC = () => {
-  const [view, setView] = useState<'home' | 'results' | 'dashboard'>('home');
+  const [view, setView] = useState<'home' | 'results' | 'dashboard' | 'bookings' | 'offers' | 'profile'>('home');
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<WorkerCategory | null>(null);
   const [activeFilters, setActiveFilters] = useState<{ sortBy: string, maxDistance: number }>({ sortBy: 'relevance', maxDistance: 50 });
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   
   // Data State
   const [allWorkers, setAllWorkers] = useState<WorkerProfile[]>([]);
@@ -197,7 +198,7 @@ const MainLayout: React.FC = () => {
   const getHeaderTitle = () => {
     if (view === 'dashboard') return 'Dashboard';
     if (view === 'results') return selectedCategory ? `${selectedCategory}s Nearby` : 'Search Results';
-    return 'thelocals.co';
+    return 'The Lokals';
   };
 
   return (
@@ -231,77 +232,65 @@ const MainLayout: React.FC = () => {
       <main className="max-w-5xl mx-auto px-4 pt-6">
         {view === 'home' && (
           <div className="space-y-8 animate-fade-in-up">
-            
-            {/* Categories Grid */}
-            <div>
-              <div className="flex justify-between items-end mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Browse Categories</h3>
-                  <button 
-                    onClick={() => { setView('results'); setSelectedCategory(null); setSearchQuery(''); setSearchResults(allWorkers); }}
-                    className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-                  >
-                    View all
-                  </button>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto group-focus-within:scale-105 transition-transform duration-300">
+              <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
+              <input 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="What do you need help with today?" 
+                className="relative w-full pl-14 pr-32 py-5 rounded-2xl text-gray-900 dark:text-white bg-white dark:bg-gray-800 shadow-xl outline-none font-semibold text-lg placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              />
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d={ICONS.SEARCH} />
+                </svg>
               </div>
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {Object.values(WorkerCategory).map((cat) => (
-                  <button 
-                    key={cat}
-                    onClick={() => handleCategoryClick(cat)}
-                    className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all border border-gray-100 dark:border-gray-700 h-32 group relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent dark:from-indigo-900/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform duration-300 ease-out">{CATEGORY_ICONS[cat]}</span>
-                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 relative z-10 text-center leading-tight">{cat === 'Other' ? 'Others' : cat}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+              <button 
+                type="submit"
+                className="absolute right-2.5 top-2.5 bottom-2.5 bg-gray-900 dark:bg-indigo-600 hover:bg-gray-800 dark:hover:bg-indigo-700 text-white px-6 rounded-xl font-bold transition-colors flex items-center gap-2"
+              >
+                {isSearching ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                    <>Search</>
+                )}
+              </button>
+            </form>
 
-            {/* Hero Section */}
-            <div className="bg-gray-900 dark:bg-black rounded-[2rem] p-8 md:p-12 text-center text-white shadow-2xl shadow-gray-300 dark:shadow-gray-900 relative overflow-hidden group">
-              {/* Abstract BG shapes */}
-              <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-500 via-purple-500 to-transparent"></div>
-              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-30 group-hover:scale-150 transition-transform duration-1000"></div>
-              
-              <div className="relative z-10">
-                <span className="inline-block py-1 px-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold tracking-wide mb-6 text-indigo-200">
-                    ✨ LIVE BOOKING AVAILABLE
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
-                   Local experts. <br/>
-                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">Instant solutions.</span>
-                </h2>
-                <p className="text-gray-300 mb-10 text-lg max-w-xl mx-auto font-medium">
-                  Connect with verified plumbers, cleaners, tutors, and mechanics nearby. Track your service in real-time.
-                </p>
-                
-                <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto group-focus-within:scale-105 transition-transform duration-300">
-                  <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                  <input 
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Describe your issue (e.g. 'flat tire on main st')" 
-                    className="relative w-full pl-14 pr-32 py-5 rounded-2xl text-gray-900 dark:text-white bg-white dark:bg-gray-800 shadow-xl outline-none font-semibold text-lg placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                  />
-                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                         <path strokeLinecap="round" strokeLinejoin="round" d={ICONS.SEARCH} />
-                    </svg>
-                  </div>
+            {/* Service Groups */}
+            <div className="space-y-4">
+              {Object.values(SERVICE_GROUPS).map((group) => (
+                <div key={group.name} className={`rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800`}>
                   <button 
-                    type="submit"
-                    className="absolute right-2.5 top-2.5 bottom-2.5 bg-gray-900 dark:bg-indigo-600 hover:bg-gray-800 dark:hover:bg-indigo-700 text-white px-6 rounded-xl font-bold transition-colors flex items-center gap-2"
+                    onClick={() => setExpandedGroup(expandedGroup === group.name ? null : group.name)}
+                    className="w-full flex items-center justify-between p-4 text-left"
                   >
-                    {isSearching ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                        <>Search</>
-                    )}
+                    <div className="flex items-center gap-4">
+                      <span className={`text-2xl bg-${group.color}-100 dark:bg-${group.color}-900/50 p-2 rounded-lg`}>{group.icon}</span>
+                      <span className="font-bold text-lg text-gray-800 dark:text-white">{group.name}</span>
+                    </div>
+                    <svg className={`w-6 h-6 transform transition-transform ${expandedGroup === group.name ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </button>
-                </form>
-              </div>
+                  {expandedGroup === group.name && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-t border-gray-200 dark:border-gray-700">
+                      {group.categories.map((cat) => (
+                        <button 
+                          key={cat}
+                          onClick={() => handleCategoryClick(cat)}
+                          className="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-600/50 hover:-translate-y-1 transition-all h-28 group"
+                        >
+                           <span className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300 ease-out">{CATEGORY_ICONS[cat]}</span>
+                           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-center leading-tight">{cat}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Promo Cards */}
@@ -375,10 +364,31 @@ const MainLayout: React.FC = () => {
           </div>
         )}
 
-        {view === 'dashboard' && (
-            <UserDashboard />
-        )}
+        {view === 'dashboard' && <UserDashboard />}
+        {view === 'bookings' && <div className="text-center py-20"><h2 className="text-2xl font-bold">My Bookings</h2></div>}
+        {view === 'offers' && <div className="text-center py-20"><h2 className="text-2xl font-bold">Special Offers</h2></div>}
+        {view === 'profile' && <UserDashboard />}
       </main>
+
+        {/* Sticky Bottom Nav */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg flex justify-around max-w-5xl mx-auto rounded-t-2xl">
+            <button onClick={() => setView('home')} className={`flex flex-col items-center p-3 text-sm font-semibold ${view === 'home' ? 'text-indigo-600' : 'text-gray-500'}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-7 4h4a1 1 0 001-1v-4a1 1 0 00-1-1h-4a1 1 0 00-1 1v4a1 1 0 001 1z" /></svg>
+                Home
+            </button>
+            <button onClick={() => setView('bookings')} className={`flex flex-col items-center p-3 text-sm font-semibold ${view === 'bookings' ? 'text-indigo-600' : 'text-gray-500'}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                Bookings
+            </button>
+            <button onClick={() => setView('offers')} className={`flex flex-col items-center p-3 text-sm font-semibold ${view === 'offers' ? 'text-indigo-600' : 'text-gray-500'}`}>
+                 <svg className="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm0 14c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm-7-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm14 0c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"/></svg>
+                Offers
+            </button>
+            <button onClick={() => setView('profile')} className={`flex flex-col items-center p-3 text-sm font-semibold ${view === 'profile' ? 'text-indigo-600' : 'text-gray-500'}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                Profile
+            </button>
+        </nav>
     </div>
   );
 };
