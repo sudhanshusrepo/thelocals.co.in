@@ -27,6 +27,19 @@ export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
   [WorkerCategory.DOCTOR_NURSE]: '🧑‍⚕️',
   [WorkerCategory.TIFFIN_SERVICE]: '🍱',
   [WorkerCategory.ERRAND_RUNNER]: '🏃‍♂️',
+  [WorkerCategory.HOUSE_CLEANING]: '🏠',
+  [WorkerCategory.LAUNDRY_SERVICE]: '🧺',
+  [WorkerCategory.PEST_CONTROL]: '🦟',
+  [WorkerCategory.APPLIANCE_REPAIR]: '🛠️',
+  [WorkerCategory.LOCKSMITH]: '🔑',
+  [WorkerCategory.BIKE_REPAIR]: '🚲',
+  [WorkerCategory.ROADSIDE_ASSISTANCE]: '🆘',
+  [WorkerCategory.BEAUTICIAN]: '💅',
+  [WorkerCategory.BABYSITTER]: '👶',
+  [WorkerCategory.PET_SITTER]: '🐾',
+  [WorkerCategory.COOK]: '👩‍🍳',
+  [WorkerCategory.PACKERS_AND_MOVERS]: '📦',
+  [WorkerCategory.DOCUMENTATION_ASSISTANCE]: '📄',
   [WorkerCategory.OTHER]: "🔍",
 };
 
@@ -38,37 +51,38 @@ type ServiceGroup = {
 }
 
 export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
-  "Home Help": {
-    name: "Home Help",
+  "Home Care": {
+    name: "Home Care",
     icon: "🏠",
     color: "blue",
-    categories: [WorkerCategory.MAID, WorkerCategory.GARDENER, WorkerCategory.PAINTER]
+    categories: [WorkerCategory.MAID, WorkerCategory.HOUSE_CLEANING, WorkerCategory.LAUNDRY_SERVICE, WorkerCategory.PEST_CONTROL, WorkerCategory.GARDENER, WorkerCategory.PAINTER]
   },
-  "Repairs & Maintenance": {
-    name: "Repairs & Maintenance",
+  "Appliance & Auto": {
+    name: "Appliance & Auto",
     icon: "🛠️",
     color: "green",
-    categories: [WorkerCategory.ELECTRICIAN, WorkerCategory.PLUMBER, WorkerCategory.AC_REPAIR, WorkerCategory.CARPENTER]
+    categories: [WorkerCategory.ELECTRICIAN, WorkerCategory.PLUMBER, WorkerCategory.AC_REPAIR, WorkerCategory.CARPENTER, WorkerCategory.APPLIANCE_REPAIR, WorkerCategory.LOCKSMITH]
   },
-  "Vehicle Help": {
-    name: "Vehicle Help",
+  "Transportation": {
+    name: "Transportation",
     icon: "🚗",
     color: "red",
-    categories: [WorkerCategory.MECHANIC, WorkerCategory.DRIVER, WorkerCategory.CAR_WASHING]
+    categories: [WorkerCategory.MECHANIC, WorkerCategory.DRIVER, WorkerCategory.CAR_WASHING, WorkerCategory.BIKE_REPAIR, WorkerCategory.ROADSIDE_ASSISTANCE]
   },
-  "Personal Services": {
-    name: "Personal Services",
+  "Personal & Family": {
+    name: "Personal & Family",
     icon: "🤝",
     color: "purple",
-    categories: [WorkerCategory.TEACHER, WorkerCategory.TRAINER, WorkerCategory.DOCTOR_NURSE, WorkerCategory.TIFFIN_SERVICE]
+    categories: [WorkerCategory.TEACHER, WorkerCategory.TRAINER, WorkerCategory.DOCTOR_NURSE, WorkerCategory.TIFFIN_SERVICE, WorkerCategory.BEAUTICIAN, WorkerCategory.BABYSITTER, WorkerCategory.PET_SITTER, WorkerCategory.COOK]
   },
   "Other Essentials": {
     name: "Other Essentials",
     icon: "📦",
     color: "gray",
-    categories: [WorkerCategory.ERRAND_RUNNER, WorkerCategory.OTHER]
+    categories: [WorkerCategory.ERRAND_RUNNER, WorkerCategory.PACKERS_AND_MOVERS, WorkerCategory.DOCUMENTATION_ASSISTANCE, WorkerCategory.OTHER]
   }
 }
+
 
 // Helper to generate random coordinates near a base location (approx 10km radius)
 const randomNear = (lat: number, lng: number) => {

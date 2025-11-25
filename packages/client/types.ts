@@ -15,6 +15,19 @@ export enum WorkerCategory {
   DOCTOR_NURSE = 'Doctor/Nurse',
   TIFFIN_SERVICE = 'Tiffin Service',
   ERRAND_RUNNER = 'Errand Runner',
+  HOUSE_CLEANING = 'House Cleaning',
+  LAUNDRY_SERVICE = 'Laundry Service',
+  PEST_CONTROL = 'Pest Control',
+  APPLIANCE_REPAIR = 'Appliance Repair',
+  LOCKSMITH = 'Locksmith',
+  BIKE_REPAIR = 'Bike Repair',
+  ROADSIDE_ASSISTANCE = 'Roadside Assistance',
+  BEAUTICIAN = 'Beautician',
+  BABYSITTER = 'Babysitter',
+  PET_SITTER = 'Pet Sitter',
+  COOK = 'Cook',
+  PACKERS_AND_MOVERS = 'Packers and Movers',
+  DOCUMENTATION_ASSISTANCE = 'Documentation Assistance',
   OTHER = 'Other'
 }
 
