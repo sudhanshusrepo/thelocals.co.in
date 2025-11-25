@@ -297,7 +297,7 @@ const MainLayout: React.FC = () => {
     const isResultsPageLoading = isLoading || isLocationLoading;
 
     return (
-        <SkeletonTheme baseColor="#202020" highlightColor="#444">
+        <SkeletonTheme baseColor="#dcfce7" highlightColor="#bbf7d0">
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-20">
                 <BookingModal worker={selectedWorker} onClose={() => setSelectedWorker(null)} onAuthReq={() => { setSelectedWorker(null); setShowAuthModal(true); }} />
                 {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
