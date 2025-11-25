@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
                 <button onClick={onLogoClick} className="flex items-center gap-2">
                      <span className="text-3xl">🏡</span>
-                    <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tighter">thelocals.co</span>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tighter">the lokals</span>
                 </button>
             )}
           </div>
@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-4">
              {/* The link to the provider app can live here */}
              <a 
-                href="https://pro.thelocals.co.in" // Or your dev subdomain
+                href="https://pro.the-lokals.co.in" // Or your dev subdomain
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hidden sm:inline text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"

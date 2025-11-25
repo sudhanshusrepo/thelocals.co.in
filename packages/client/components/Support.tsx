@@ -10,7 +10,7 @@ export const Support: React.FC = () => {
         <h3>Contact Us</h3>
         <p>If you need help, you can reach us at:</p>
         <ul>
-          <li>Email: support@thelocals.co</li>
+          <li>Email: support@the-lokals</li>
           <li>Phone: 1-800-555-1234</li>
         </ul>
         <h3>Frequently Asked Questions</h3>
