@@ -219,13 +219,6 @@ const DashboardPage: React.FC<{isLoading: boolean}> = ({isLoading}) => {
 }
 
 const MainLayout: React.FC = () => {
-
-    useEffect(() => {
-        if (window.location.pathname === '/providers') {
-            window.location.href = 'https://pro.thelokals.com';
-        }
-    }, []);
-
     const navigate = useNavigate();
     const location = useLocation();
     const { category } = useParams<{ category: string }>();

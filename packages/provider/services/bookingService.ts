@@ -1,5 +1,5 @@
-import { supabase } from '../../client/services/supabase'; // Adjust path as needed
-import { Booking, BookingStatus } from '../../client/types'; // Adjust path as needed
+import { supabase } from './supabase';
+import { Booking, BookingStatus } from '../types';
 
 export const bookingService = {
 
