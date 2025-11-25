@@ -142,7 +142,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
       WorkerCategory.PHOTOGRAPHY,
       WorkerCategory.VIDEOGRAPHY,
       WorkerCategory.DOCUMENTATION_ASSISTANCE,
-      Worker.SECURITY,
+      WorkerCategory.SECURITY,
       WorkerCategory.OTHER
     ]
   }
