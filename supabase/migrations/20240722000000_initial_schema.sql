@@ -1,6 +1,17 @@
 
--- Enable Realtime for all tables
-ALTER PUBLICATION supabase_realtime ADD TABLE profiles, workers, bookings, reviews;
+-- Drop existing objects to ensure a clean slate
+DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TABLE IF EXISTS public.bookings CASCADE;
+DROP TABLE IF EXISTS public.workers CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
+
+DROP TYPE IF EXISTS public.user_role CASCADE;
+DROP TYPE IF EXISTS public.worker_category CASCADE;
+DROP TYPE IF EXISTS public.worker_status CASCADE;
+DROP TYPE IF EXISTS public.booking_status CASCADE;
+
+DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
+DROP FUNCTION IF EXISTS public.update_worker_rating() CASCADE;
 
 -- Custom Types (Enums)
 CREATE TYPE public.user_role AS ENUM (
@@ -190,3 +201,6 @@ CREATE POLICY "Reviews are public and viewable by everyone." ON public.reviews
 
 CREATE POLICY "Users can only write reviews for their completed bookings." ON public.reviews
   FOR INSERT WITH CHECK (auth.uid() = user_id AND (SELECT status FROM bookings WHERE id = booking_id) = 'COMPLETED');
+
+-- Enable Realtime for all tables
+ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles, public.workers, public.bookings, public.reviews;
