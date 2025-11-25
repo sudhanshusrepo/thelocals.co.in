@@ -5,17 +5,14 @@ import { WorkerCard } from './components/WorkerCard';
 import { BookingModal } from './components/BookingModal';
 import { AuthModal } from './components/AuthModal';
 import { UserDashboard, DashboardView } from './components/UserDashboard';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CATEGORY_ICONS, DEFAULT_CENTER, SERVICE_GROUPS } from './constants';
 import { WorkerCategory, WorkerProfile, Coordinates } from './types';
 import { workerService } from './services/workerService';
 import SearchBar from './components/SearchBar';
 
-// --- Types ---
-// Consolidating view types for clearer state management
 type View = 'home' | 'results' | 'dashboard';
 
-// --- Helper Functions ---
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
   const R = 6371;
@@ -29,9 +26,24 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
   return R * c;
 }
 
+// --- Unauthenticated User Placeholder ---
+const AuthRequiredPlaceholder: React.FC<{ onSignIn: () => void, view: DashboardView }> = ({ onSignIn, view }) => (
+    <div className="text-center py-20 animate-fade-in">
+        <div className="text-6xl mb-4">🔐</div>
+        <h3 className="text-2xl font-bold dark:text-white">Authentication Required</h3>
+        <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6">Please sign in to view your {view.toLowerCase()}.</p>
+        <button 
+            onClick={onSignIn}
+            className="px-6 py-3 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md"
+        >
+            Sign In
+        </button>
+    </div>
+);
+
 // --- Main Application Component ---
 const MainLayout: React.FC = () => {
-  // --- State Management ---
+  const { user } = useAuth(); // Use auth context
   const [view, setView] = useState<View>('home');
   const [dashboardView, setDashboardView] = useState<DashboardView>('Bookings');
 
@@ -46,14 +58,12 @@ const MainLayout: React.FC = () => {
   const [selectedWorker, setSelectedWorker] = useState<WorkerProfile | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // --- Data Fetching and Initialization ---
   useEffect(() => {
     const initialize = async () => {
       setIsLoading(true);
       try {
         const workers = await workerService.getWorkers();
         setAllWorkers(workers);
-        // We can ask for location silently here
         navigator.geolocation.getCurrentPosition(
             (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
             () => setUserLocation(DEFAULT_CENTER) 
@@ -67,7 +77,6 @@ const MainLayout: React.FC = () => {
     initialize();
   }, []);
 
-  // --- Event Handlers ---
   const handleSearch = (query: string, category: WorkerCategory | null) => {
     setSearchQuery(query);
     setSelectedCategory(category);
@@ -75,7 +84,7 @@ const MainLayout: React.FC = () => {
   };
 
   const handleCategoryClick = (category: WorkerCategory) => {
-    setSearchQuery(''); // Clear search query when a category is clicked
+    setSearchQuery('');
     setSelectedCategory(category);
     setView('results');
   };
@@ -91,8 +100,8 @@ const MainLayout: React.FC = () => {
       setSearchQuery('');
   }
 
-  // --- Derived State (Filtering & Sorting) ---
   const filteredAndSortedWorkers = useMemo(() => {
+    // This calculation is expensive, so it's memoized.
     const workersWithDistance = allWorkers.map(worker => ({
       ...worker,
       distanceKm: getDistanceFromLatLonInKm(userLocation.lat, userLocation.lng, worker.location.lat, worker.location.lng)
@@ -126,7 +135,6 @@ const MainLayout: React.FC = () => {
     return filtered;
   }, [allWorkers, userLocation, selectedCategory, searchQuery, sortBy]);
 
-  // --- Header & Title Logic ---
   const isSubPage = view === 'results' || view === 'dashboard';
   const getHeaderTitle = () => {
       if (view === 'results') return selectedCategory || 'Search Results';
@@ -134,19 +142,18 @@ const MainLayout: React.FC = () => {
       return 'The Lokals';
   }
 
-  // --- JSX Rendering ---
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-20">
       <BookingModal worker={selectedWorker} onClose={() => setSelectedWorker(null)} onAuthReq={() => { setSelectedWorker(null); setShowAuthModal(true); }} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
       <Header 
-        isHome={!isSubPage} 
+        isHome={!isSubPage && view !== 'dashboard'} 
         onBack={goHome} 
         onLogoClick={goHome}
         title={getHeaderTitle()}
         onSignInClick={() => setShowAuthModal(true)}
-        onDashboardClick={() => handleBottomNavClick('dashboard', 'Profile')}
+        // The dashboard button in the header is removed to avoid confusion
       />
 
       <main className="max-w-5xl mx-auto px-4 pt-6">
@@ -210,42 +217,44 @@ const MainLayout: React.FC = () => {
           </div>
         )}
 
-        {view === 'dashboard' && <UserDashboard initialView={dashboardView} />}
+        {view === 'dashboard' && (
+            user ? (
+                <UserDashboard initialView={dashboardView} />
+            ) : (
+                <AuthRequiredPlaceholder onSignIn={() => setShowAuthModal(true)} view={dashboardView} />
+            )
+        )}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex justify-around max-w-5xl mx-auto rounded-t-2xl shadow-lg">
-            <NavButton label="Home" view="home" currentView={view} onClick={() => handleBottomNavClick('home')} />
-            <NavButton label="Bookings" view="dashboard" currentView={view} onClick={() => handleBottomNavClick('dashboard', 'Bookings')} />
-            <NavButton label="Profile" view="dashboard" currentView={view} data-subview="Profile" onClick={() => handleBottomNavClick('dashboard', 'Profile')} />
+            <NavButton label="Home" view="home" currentView={view} dashboardView={dashboardView} onClick={() => handleBottomNavClick('home')} />
+            <NavButton label="Bookings" view="dashboard" currentView={view} dashboardView={dashboardView} data-subview="Bookings" onClick={() => handleBottomNavClick('dashboard', 'Bookings')} />
+            <NavButton label="Profile" view="dashboard" currentView={view} dashboardView={dashboardView} data-subview="Profile" onClick={() => handleBottomNavClick('dashboard', 'Profile')} />
       </nav>
     </div>
   );
 };
 
-// --- Sub-components ---
-
 interface NavButtonProps {
     label: string;
     view: View;
     currentView: View;
+    dashboardView: DashboardView;
     onClick: () => void;
     'data-subview'?: DashboardView;
 }
 
-const NavButton: React.FC<NavButtonProps> = ({ label, view, currentView, onClick, 'data-subview': dataSubview }) => {
-    // A tab is active if its main view matches, and if it has a subview, that must also match.
-    const isActive = currentView === view && (dataSubview ? dataSubview === (view === 'dashboard' ? (dataSubview) : null) : true);
-
+const NavButton: React.FC<NavButtonProps> = ({ label, view, currentView, dashboardView, onClick, 'data-subview': dataSubview }) => {
+    const isActive = view === currentView && (view !== 'dashboard' || dashboardView === dataSubview);
     return (
         <button 
             onClick={onClick}
-            className={`flex flex-col items-center p-3 text-sm font-semibold transition-colors ${isActive ? 'text-indigo-600' : 'text-gray-500'}`}>
+            className={`flex flex-col items-center justify-center flex-1 p-3 text-sm font-semibold transition-colors ${isActive ? 'text-indigo-600' : 'text-gray-500'}`}>
             {label}
         </button>
     )
 }
 
-// --- Root Component ---
 export default function App() {
   return (
     <AuthProvider>

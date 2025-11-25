@@ -10,7 +10,6 @@ import { TermsAndConditions } from './TermsAndConditions';
 import { Support } from './Support';
 import { User } from '@supabase/supabase-js';
 
-// Exporting View type to be used in App.tsx
 export type DashboardView = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Support';
 type Tab = 'Upcoming' | 'Active' | 'Past';
 
@@ -25,13 +24,11 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('Upcoming');
-  // The activeView state is now initialized by the initialView prop
-  const [activeView, setActiveView] = useState<DashboardView>(initialView);
 
-  const fetchBookings = async () => {
-    if (!user) return;
+  const fetchBookings = async (userId: string) => {
+    setLoading(true);
     try {
-      const data = await bookingService.getUserBookings(user.id);
+      const data = await bookingService.getUserBookings(userId);
       setBookings(data);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -41,17 +38,18 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndBookings = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-    }
-    fetchUser();
+      if (user) {
+        fetchBookings(user.id);
+      }
+    };
+    fetchUserAndBookings();
   }, []);
 
   useEffect(() => {
     if (user) {
-        fetchBookings();
-
         const channel = supabase
         .channel('schema-db-changes')
         .on(
@@ -60,17 +58,20 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
             event: 'UPDATE',
             schema: 'public',
             table: 'bookings',
+            filter: `user_id=eq.${user.id}`
             },
             (payload) => {
-            setBookings((current) => 
-                current.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b)
-            );
+                setBookings((current) => 
+                    current.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b)
+                );
+                // Refetch to be sure
+                fetchBookings(user.id);
             }
         )
         .subscribe();
 
         return () => {
-        supabase.removeChannel(channel);
+            supabase.removeChannel(channel);
         };
     }
   }, [user]);
@@ -79,17 +80,16 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   const activeBookings = bookings.filter(b => b.status === 'in_progress');
   const pastBookings = bookings.filter(b => b.status === 'completed' || b.status === 'cancelled');
 
-  const renderBookings = (bookingList: Booking[]) => {
+  const renderBookingsList = (bookingList: Booking[]) => {
     if (bookingList.length === 0) {
       return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
             <div className="text-6xl mb-4">📭</div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No requests in this category</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Your bookings will appear here once their status changes.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No requests here</h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">Your active bookings will appear here.</p>
         </div>
       );
     }
-
     return (
         <div className="space-y-4">
             {bookingList.map((booking) => (
@@ -99,82 +99,56 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
     );
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading dashboard...</div>;
+  const renderBookingsView = () => {
+      if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading your bookings...</div>;
+      return (
+        <div className="animate-fade-in">
+            <div className="border-b border-gray-200 dark:border-gray-700">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                <TabButton title="Upcoming" count={upcomingBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabButton title="Active" count={activeBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabButton title="Past" count={pastBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
+                </nav>
+            </div>
+
+            <div className="mt-6">
+                {activeTab === 'Upcoming' && renderBookingsList(upcomingBookings)}
+                {activeTab === 'Active' && renderBookingsList(activeBookings)}
+                {activeTab === 'Past' && renderBookingsList(pastBookings)}
+            </div>
+      </div>
+      )
+  }
 
   return (
-    <div className="max-w-4xl mx-auto flex space-x-8 pb-20 animate-fade-in">
-      <nav className="w-1/4 space-y-2">
-          <NavItem view="Bookings" activeView={activeView} setActiveView={setActiveView} />
-          <NavItem view="Profile" activeView={activeView} setActiveView={setActiveView} />
-          <NavItem view="Terms & Conditions" activeView={activeView} setActiveView={setActiveView} />
-          <NavItem view="Support" activeView={activeView} setActiveView={setActiveView} />
-      </nav>
+    <div className="max-w-4xl mx-auto pb-20">
+        {/* Based on the initialView prop, render the correct component directly */}
+        {initialView === 'Bookings' && renderBookingsView()}
+        {initialView === 'Profile' && <Profile />}
+        {initialView === 'Terms & Conditions' && <TermsAndConditions />}
+        {initialView === 'Support' && <Support />}
 
-      <div className="w-3/4">
-        {activeView === 'Bookings' && (
-            <div>
-                <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Requests</h2>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Live Updates Active <span className="inline-block w-2 h-2 bg-green-500 rounded-full ml-1 animate-pulse"></span></div>
-                </div>
-
-                <div className="border-b border-gray-200 dark:border-gray-700 mt-4">
-                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                    <TabButton title="Upcoming" count={upcomingBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-                    <TabButton title="Active" count={activeBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-                    <TabButton title="Past" count={pastBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
-                    </nav>
-                </div>
-
-                <div className="mt-6">
-                    {activeTab === 'Upcoming' && renderBookings(upcomingBookings)}
-                    {activeTab === 'Active' && renderBookings(activeBookings)}
-                    {activeTab === 'Past' && renderBookings(pastBookings)}
-                </div>
-            </div>
+        {/* Modals remain at this level to be displayed over the content */}
+        {paymentBooking && (
+            <PaymentModal
+                booking={paymentBooking}
+                onClose={() => setPaymentBooking(null)}
+                onPaymentSuccess={() => user && fetchBookings(user.id)}
+            />
         )}
-
-        {activeView === 'Profile' && <Profile />}
-        {activeView === 'Terms & Conditions' && <TermsAndConditions />}
-        {activeView === 'Support' && <Support />}
-      </div>
-
-      {paymentBooking && (
-          <PaymentModal
-            booking={paymentBooking}
-            onClose={() => setPaymentBooking(null)}
-            onPaymentSuccess={fetchBookings}
-          />
-      )}
-
-      {reviewBooking && (
-          <ReviewModal 
-            booking={reviewBooking} 
-            onClose={() => setReviewBooking(null)} 
-            onReviewSubmitted={fetchBookings}
-          />
-      )}
+        {reviewBooking && (
+            <ReviewModal 
+                booking={reviewBooking} 
+                onClose={() => setReviewBooking(null)} 
+                onReviewSubmitted={() => user && fetchBookings(user.id)}
+            />
+        )}
     </div>
   );
 };
 
-const NavItem: React.FC<{view: DashboardView, activeView: DashboardView, setActiveView: (view: DashboardView) => void}> = ({ view, activeView, setActiveView }) => {
-    const isActive = activeView === view;
-    return (
-        <button
-            onClick={() => setActiveView(view)}
-            className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
-            }`}>
-            {view}
-        </button>
-    )
-}
 
 // Sub-components for clarity
-
 const TabButton: React.FC<{title: Tab, count: number, activeTab: Tab, setActiveTab: (tab: Tab) => void}> = ({ title, count, activeTab, setActiveTab }) => {
     const isActive = activeTab === title;
     return (
@@ -204,22 +178,9 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
             default: return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
         }
     };
-
-    const getStatusLabel = (status: BookingStatus) => {
-        switch(status) {
-            case 'pending': return 'Waiting for acceptance';
-            case 'confirmed': return 'Expert is on the way';
-            case 'in_progress': return 'Job in progress';
-            case 'completed': return 'Job Completed';
-            default: return status;
-        }
-    };
     
     return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md dark:hover:shadow-none transition-shadow relative overflow-hidden">
-            {booking.status === 'confirmed' && (
-                 <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 animate-pulse-slow"></div>
-            )}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                      <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl overflow-hidden">
@@ -234,13 +195,9 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
                     {booking.status.toUpperCase()}
                 </div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-sm text-gray-600 dark:text-gray-300 mb-4">
-                <p className="line-clamp-2">"{booking.note}"</p>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    {getStatusLabel(booking.status)}
-                </p>
+            
+            <div className="flex items-center justify-between mt-4">
+                 <p className="text-sm font-bold text-gray-800 dark:text-gray-100">Total: ${booking.price}</p>
                 <div className="flex gap-2">
                     {booking.status === 'completed' && (
                         <>
@@ -263,7 +220,7 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
                     )}
                      {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
                         <button className="text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
-                            <span>📞</span> Call
+                            <span>📞</span> Call Expert
                         </button>
                     )}
                 </div>
