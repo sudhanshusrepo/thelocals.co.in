@@ -77,7 +77,7 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({ worker, distanceKm, onCo
                  <path d={ICONS.STAR} />
                </svg>
                {worker.rating}
-               <span className="text-gray-400 font-normal text-xs">({worker.reviewCount})</span>
+               {/* The reviewCount field is not available in the database and has been removed from here */}
             </div>
             {distanceKm !== undefined && (
               <div className="flex items-center text-gray-500 dark:text-gray-400 gap-1">

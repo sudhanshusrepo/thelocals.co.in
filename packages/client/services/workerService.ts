@@ -2,39 +2,38 @@
 import { supabase } from './supabase';
 import { WorkerProfile, WorkerCategory, WorkerStatus } from '../types';
 
+// The new select query joins the 'profiles' table to get the avatar_url
+// and selects columns that actually exist in your schema.
 const selectQuery = `
     id, 
     name, 
     category, 
     description, 
-    price, 
-    price_unit,
+    price_per_hour,
     rating,
     status,
-    image_url,
     expertise,
-    review_count,
-    experience_years,
-    is_verified,
     location_lat,
-    location_lng
+    location_lng,
+    profile:profiles ( avatar_url )
 `;
 
-// Helper to transform worker data from DB to frontend structure
+// This function transforms the raw database response into the frontend's WorkerProfile type.
 const transformWorker = (worker: any): WorkerProfile => ({
   id: worker.id,
   name: worker.name,
   category: worker.category,
   description: worker.description,
-  price: worker.price,
-  priceUnit: worker.price_unit,
+  price: worker.price_per_hour, // Map from database column
+  priceUnit: 'hr', // Hardcode as per the new schema
   rating: worker.rating,
   status: worker.status || 'OFFLINE',
-  imageUrl: worker.image_url,
-  expertise: worker.expertise,
-  reviewCount: worker.review_count,
-  experienceYears: worker.experience_years,
-  isVerified: worker.is_verified,
+  // Use a default avatar and handle the nested profile structure from Supabase
+  imageUrl: worker.profile?.avatar_url || `https://i.pravatar.cc/150?u=${worker.id}`,
+  expertise: worker.expertise || [],
+  // Default these fields as they don't exist in the database
+  reviewCount: 0, 
+  isVerified: false,
   location: {
     lat: worker.location_lat,
     lng: worker.location_lng,
@@ -102,6 +101,7 @@ export const workerService = {
     }
   },
 
+  // This function is updated to only map fields that exist in the database
   async updateWorkerProfile(workerId: string, updates: Partial<WorkerProfile>) {
     if (!workerId || !updates) {
         throw new Error("workerId and updates are required.");
@@ -110,17 +110,13 @@ export const workerService = {
     const dbPayload: any = {};
     if (updates.name !== undefined) dbPayload.name = updates.name;
     if (updates.category !== undefined) dbPayload.category = updates.category;
-    if (updates.price !== undefined) dbPayload.price = updates.price;
-    if (updates.priceUnit !== undefined) dbPayload.price_unit = updates.priceUnit;
+    if (updates.price !== undefined) dbPayload.price_per_hour = updates.price; // Map to correct DB column
     if (updates.description !== undefined) dbPayload.description = updates.description;
     if (updates.location !== undefined) {
         dbPayload.location_lat = updates.location.lat;
         dbPayload.location_lng = updates.location.lng;
     }
-    if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
     if (updates.expertise !== undefined) dbPayload.expertise = updates.expertise;
-    if (updates.experienceYears !== undefined) dbPayload.experience_years = updates.experienceYears;
-    if (updates.isVerified !== undefined) dbPayload.is_verified = updates.isVerified;
 
     try {
         const { error } = await supabase

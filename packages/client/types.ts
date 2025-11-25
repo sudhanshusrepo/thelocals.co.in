@@ -1,34 +1,25 @@
 
 export enum WorkerCategory {
-  PLUMBER = 'Plumber',
-  ELECTRICIAN = 'Electrician',
-  MAID = 'Maid',
-  MECHANIC = 'Mechanic',
-  CARPENTER = 'Carpenter',
-  PAINTER = 'Painter',
-  AC_REPAIR = 'AC Repair',
-  GARDENER = 'Gardener',
-  TEACHER = 'Tutor',
-  TRAINER = 'Personal Trainer',
-  DRIVER = 'Driver',
-  CAR_WASHING = 'Car Washing',
-  DOCTOR_NURSE = 'Doctor/Nurse',
-  TIFFIN_SERVICE = 'Tiffin Service',
-  ERRAND_RUNNER = 'Errand Runner',
-  HOUSE_CLEANING = 'House Cleaning',
-  LAUNDRY_SERVICE = 'Laundry Service',
-  PEST_CONTROL = 'Pest Control',
-  APPLIANCE_REPAIR = 'Appliance Repair',
-  LOCKSMITH = 'Locksmith',
-  BIKE_REPAIR = 'Bike Repair',
-  ROADSIDE_ASSISTANCE = 'Roadside Assistance',
-  BEAUTICIAN = 'Beautician',
-  BABYSITTER = 'Babysitter',
-  PET_SITTER = 'Pet Sitter',
-  COOK = 'Cook',
-  PACKERS_AND_MOVERS = 'Packers and Movers',
-  DOCUMENTATION_ASSISTANCE = 'Documentation Assistance',
-  OTHER = 'Other'
+    Cleaning = 'Cleaning',
+    Plumbing = 'Plumbing',
+    Electrical = 'Electrical',
+    Handyman = 'Handyman',
+    Painting = 'Painting',
+    Gardening = 'Gardening',
+    Moving = 'Moving',
+    Assembly = 'Assembly',
+    Tutoring = 'Tutoring',
+    PetCare = 'PetCare',
+    Landscaping = 'Landscaping',
+    HVAC = 'HVAC',
+    PestControl = 'PestControl',
+    Security = 'Security',
+    TechSupport = 'TechSupport',
+    Catering = 'Catering',
+    Beauty = 'Beauty',
+    Fitness = 'Fitness',
+    Photography = 'Photography',
+    Videography = 'Videography'
 }
 
 export type WorkerStatus = 'AVAILABLE' | 'BUSY' | 'OFFLINE';
@@ -38,18 +29,17 @@ export interface WorkerProfile {
   name: string;
   category: WorkerCategory;
   rating: number;
-  reviewCount: number;
-  price: number; // Base price or hourly rate
-  priceUnit: 'hr' | 'visit' | 'service';
-  experienceYears: number;
+  reviewCount: number; // Note: This field is not in the database and will be defaulted.
+  price: number; // Mapped from price_per_hour
+  priceUnit: 'hr'; // Hardcoded to 'hr' as per the new schema
   expertise: string[];
   description: string;
-  imageUrl: string;
+  imageUrl: string; // from profiles.avatar_url
   location: {
     lat: number;
     lng: number;
   };
-  isVerified: boolean;
+  isVerified: boolean; // Note: This field is not in the database and will be defaulted.
   status: WorkerStatus;
 }
 
