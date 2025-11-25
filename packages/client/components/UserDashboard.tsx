@@ -10,17 +10,23 @@ import { TermsAndConditions } from './TermsAndConditions';
 import { Support } from './Support';
 import { User } from '@supabase/supabase-js';
 
-type View = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Support';
+// Exporting View type to be used in App.tsx
+export type DashboardView = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Support';
 type Tab = 'Upcoming' | 'Active' | 'Past';
 
-export const UserDashboard: React.FC = () => {
+interface UserDashboardProps {
+  initialView?: DashboardView;
+}
+
+export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Bookings' }) => {
   const [user, setUser] = useState<User | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('Upcoming');
-  const [activeView, setActiveView] = useState<View>('Bookings');
+  // The activeView state is now initialized by the initialView prop
+  const [activeView, setActiveView] = useState<DashboardView>(initialView);
 
   const fetchBookings = async () => {
     if (!user) return;
@@ -152,7 +158,7 @@ export const UserDashboard: React.FC = () => {
   );
 };
 
-const NavItem: React.FC<{view: View, activeView: View, setActiveView: (view: View) => void}> = ({ view, activeView, setActiveView }) => {
+const NavItem: React.FC<{view: DashboardView, activeView: DashboardView, setActiveView: (view: DashboardView) => void}> = ({ view, activeView, setActiveView }) => {
     const isActive = activeView === view;
     return (
         <button
