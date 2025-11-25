@@ -35,7 +35,6 @@ const MainLayout: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<WorkerCategory | null>(null);
   const [activeFilters, setActiveFilters] = useState<{ sortBy: string, maxDistance: number }>({ sortBy: 'relevance', maxDistance: 50 });
-  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [locationPermission, setLocationPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
   const [showLocationModal, setShowLocationModal] = useState(false);
   
@@ -311,33 +310,23 @@ const MainLayout: React.FC = () => {
             {/* Service Groups */}
             <div className="space-y-4">
               {Object.values(SERVICE_GROUPS).map((group) => (
-                <div key={group.name} className={`rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800`}>
-                  <button 
-                    onClick={() => setExpandedGroup(expandedGroup === group.name ? null : group.name)}
-                    className="w-full flex items-center justify-between p-4 text-left"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className={`text-2xl bg-${group.color}-100 dark:bg-${group.color}-900/50 p-2 rounded-lg`}>{group.icon}</span>
-                      <span className="font-bold text-lg text-gray-800 dark:text-white">{group.name}</span>
-                    </div>
-                    <svg className={`w-6 h-6 transform transition-transform ${expandedGroup === group.name ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {expandedGroup === group.name && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-t border-gray-200 dark:border-gray-700">
-                      {group.categories.map((cat) => (
-                        <button 
-                          key={cat}
-                          onClick={() => handleCategoryClick(cat)}
-                          className="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-600/50 hover:-translate-y-1 transition-all h-28 group"
-                        >
-                           <span className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300 ease-out">{CATEGORY_ICONS[cat]}</span>
-                           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-center leading-tight">{cat}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div key={group.name} className="rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className={`text-2xl bg-${group.color}-100 dark:bg-${group.color}-900/50 p-2 rounded-lg`}>{group.icon}</span>
+                    <span className="font-bold text-lg text-gray-800 dark:text-white">{group.name}</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {group.categories.map((cat) => (
+                      <button 
+                        key={cat}
+                        onClick={() => handleCategoryClick(cat)}
+                        className="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-600/50 hover:-translate-y-1 transition-all h-28 group"
+                      >
+                         <span className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300 ease-out">{CATEGORY_ICONS[cat]}</span>
+                         <span className="text-xs font-bold text-gray-600 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-center leading-tight">{cat}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
