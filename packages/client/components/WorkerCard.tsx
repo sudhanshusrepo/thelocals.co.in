@@ -1,6 +1,8 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import { WorkerProfile, WorkerStatus } from '../types';
 import { ICONS } from '../constants';
+import { ProviderStructuredData } from './StructuredData';
 
 interface WorkerCardProps {
   worker: WorkerProfile;
@@ -31,6 +33,11 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({ worker, distanceKm, onCo
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md dark:shadow-none border border-gray-100 dark:border-gray-700 transition-all duration-300 overflow-hidden flex flex-col group">
+      <Helmet>
+        <title>{worker.name} - {worker.category} | The Lokals</title>
+        <meta name="description" content={worker.description} />
+      </Helmet>
+      <ProviderStructuredData name={worker.name} jobTitle={worker.category} url={`https://thelocals.co.in/providers/${worker.id}`} />
       <div className="p-4 flex gap-4">
         <div className="relative flex-shrink-0">
           <div className="relative">

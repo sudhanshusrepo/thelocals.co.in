@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-This document outlines the architecture, components, and services of the **the lokals** web application. The application is designed to connect users with local service professionals for various tasks. It provides a platform for searching, booking, and managing services.
+This document outlines the architecture, components, and services of the thelokals.com web application. The application is designed to connect users with local service professionals for various tasks. It provides a platform for searching, booking, and managing services.
 
 **Core functionalities:**
 

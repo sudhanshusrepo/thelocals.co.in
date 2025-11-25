@@ -1,3 +1,5 @@
 {
-  "outputDirectory": "dist"
+  "rewrites": [
+    { "source": "/providers/(.*)", "destination": "/packages/provider/dist/index.html" }
+  ]
 }

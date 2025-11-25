@@ -1,46 +1,57 @@
 import React from 'react';
-import { StepProps } from '../../types';
-import { Button } from '../Button';
+import { ProviderProfile } from '../../types';
+
+interface StepProps {
+  data: ProviderProfile;
+  updateData: (d: Partial<ProviderProfile>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
 
 export const GuidelinesStep: React.FC<StepProps> = ({ data, updateData, onNext, onBack }) => {
-  
+  const handleAccept = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateData({ guidelinesAccepted: e.target.checked });
+  };
+
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-300">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-slate-900">Guidelines</h2>
-        <p className="text-slate-500 mt-1">Please review our community standards.</p>
+    <div className="flex flex-col h-full">
+      <div className="flex-1">
+        <h2 className="text-xl font-semibold text-slate-700">Community Guidelines</h2>
+        <p className="text-slate-500 mt-2">Please read and accept our guidelines to ensure a safe and professional community.</p>
+
+        <div className="mt-6 h-64 overflow-y-auto p-4 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-600 prose prose-sm">
+           <h4>1. Professionalism</h4>
+           <p>Always maintain a high standard of professionalism. Communicate clearly and respectfully with clients. Arrive on time and complete the job as agreed.</p>
+           <h4>2. Safety</h4>
+           <p>Your safety and the safety of your clients is paramount. Follow all safety protocols relevant to your service. Report any unsafe conditions immediately.</p>
+           <h4>3. Quality of Work</h4>
+           <p>Deliver high-quality work that meets or exceeds client expectations. Use appropriate tools and materials. Clean up your work area after the job is complete.</p>
+           <h4>4. Payments</h4>
+           <p>All payments must be processed through the Lokals platform. This ensures security for both you and the client. Do not solicit or accept cash payments.</p>
+           <h4>5. Cancellations</h4>
+           <p>Provide at least 24 hours notice for any cancellations. Repeated last-minute cancellations may affect your provider rating and status on the platform.</p>
+        </div>
+
+        <div className="mt-6">
+            <label className="flex items-center">
+                <input 
+                    type="checkbox" 
+                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+                    checked={data.guidelinesAccepted}
+                    onChange={handleAccept}
+                />
+                <span className="ml-3 text-sm text-slate-600">I have read and agree to the community guidelines.</span>
+            </label>
+        </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-5 h-64 overflow-y-auto shadow-inner text-sm text-slate-600 space-y-3">
-        <p><strong>1. Professionalism:</strong> Always arrive on time and maintain a professional demeanor with customers.</p>
-        <p><strong>2. Safety:</strong> Follow all safety protocols relevant to your service category.</p>
-        <p><strong>3. Respect:</strong> Treat all customers and fellow providers with respect and dignity. Discrimination of any kind is not tolerated.</p>
-        <p><strong>4. Pricing:</strong> Adhere to the agreed-upon pricing. No hidden charges.</p>
-        <p><strong>5. Quality:</strong> Strive to provide the highest quality service.</p>
-        <p><strong>6. Privacy:</strong> Respect customer privacy and do not share their personal details.</p>
-        <p>By accepting, you agree to TheLocals Terms of Service and Privacy Policy.</p>
-      </div>
-
-      <div className="flex items-center gap-3 p-4 bg-brand-50 rounded-lg border border-brand-100">
-        <input 
-          type="checkbox" 
-          id="accept" 
-          className="w-5 h-5 text-brand-600 rounded focus:ring-brand-500 border-gray-300"
-          checked={data.guidelinesAccepted}
-          onChange={(e) => updateData({ guidelinesAccepted: e.target.checked })}
-        />
-        <label htmlFor="accept" className="text-sm font-medium text-brand-900 cursor-pointer">
-          I accept the Social Guidelines & Terms
-        </label>
-      </div>
-
-      <div className="flex gap-3 pt-4">
-        <Button variant="outline" className="flex-1" onClick={onBack}>
+      <div className="mt-8 flex justify-between">
+        <button onClick={onBack} className="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
           Back
-        </Button>
-        <Button className="flex-1" onClick={onNext} disabled={!data.guidelinesAccepted}>
-          Review
-        </Button>
+        </button>
+        <button onClick={onNext} disabled={!data.guidelinesAccepted} className="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400">
+          I Agree & Continue
+        </button>
       </div>
     </div>
   );

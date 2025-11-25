@@ -1,86 +1,77 @@
 import React, { useState } from 'react';
-import { StepProps, RegistrationStatus, ProviderDocument } from '../../types';
-import { Button } from '../Button';
-import { backend } from '../../services/backend';
+import { ProviderProfile, RegistrationStatus } from '../../types';
 import { useToast } from '../Toast';
+import { backend } from '../../services/backend';
+
+interface StepProps {
+  data: ProviderProfile;
+  updateData: (d: Partial<ProviderProfile>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
 
 export const ReviewStep: React.FC<StepProps> = ({ data, updateData, onBack }) => {
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const toast = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const toast = useToast();
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-        const { error } = await backend.db.submitApplication(data);
-        if (error) throw error;
-
-        setSubmitted(true);
-        updateData({ registrationStatus: RegistrationStatus.Pending });
-        toast.success("Application submitted successfully!");
-    } catch (e) {
-        toast.error("Submission failed. Please try again.");
-    } finally {
-        setSubmitting(false);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <div className="text-center space-y-6 py-10 animate-in zoom-in fade-in duration-500">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600">
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-        </div>
-        <h2 className="text-3xl font-bold text-slate-900">Application Submitted!</h2>
-        <p className="text-slate-600 max-w-xs mx-auto">
-          Thanks, {data.fullName}. We are reviewing your documents. You will receive an SMS update within 24 hours.
-        </p>
-        <div className="pt-8">
-            <Button onClick={() => window.location.reload()}>Back to Home</Button>
-        </div>
-      </div>
-    );
-  }
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        try {
+            const finalData = { ...data, registrationStatus: RegistrationStatus.Submitted };
+            updateData(finalData);
+            await backend.db.saveProfile(finalData);
+            await backend.db.deleteDraft(); // Clear draft on successful submission
+            toast.show('Application submitted successfully! We will review it and get back to you.', { type: 'success', duration: 5000 });
+            // Here you would typically redirect to a 'Thank You' or 'Pending Review' page
+        } catch (err) {
+            toast.show(`Submission failed: ${(err as Error).message}`, { type: 'error' });
+            setIsSubmitting(false);
+        }
+    };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-300">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-slate-900">Review Application</h2>
-        <p className="text-slate-500 mt-1">Please verify your details before submitting.</p>
-      </div>
+    <div className="flex flex-col h-full">
+      <div className="flex-1">
+        <h2 className="text-xl font-semibold text-slate-700">Review & Submit</h2>
+        <p className="text-slate-500 mt-2">Please review your details one last time before submitting your application.</p>
 
-      <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 shadow-sm">
-        <div className="p-4 flex justify-between">
-          <span className="text-slate-500">Name</span>
-          <span className="font-medium text-slate-900">{data.fullName}</span>
-        </div>
-        <div className="p-4 flex justify-between">
-          <span className="text-slate-500">Mobile</span>
-          <span className="font-medium text-slate-900">+91 {data.phoneNumber}</span>
-        </div>
-        <div className="p-4 flex justify-between">
-          <span className="text-slate-500">DOB</span>
-          <span className="font-medium text-slate-900">{data.dob}</span>
-        </div>
-        <div className="p-4 flex justify-between">
-          <span className="text-slate-500">Location</span>
-          <span className="font-medium text-slate-900">{data.locality}, {data.city}</span>
-        </div>
-        <div className="p-4 flex justify-between">
-            <span className="text-slate-500">Documents</span>
-            <div className="flex gap-2">
-                {Object.values(data.documents).filter((d: ProviderDocument) => d.status === 'verified' || d.previewUrl).length} uploaded
+        <div className="mt-6 bg-white border border-slate-200 rounded-lg divide-y divide-slate-200">
+            <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Full Name</span>
+                <span className="text-sm text-slate-800 font-semibold">{data.fullName}</span>
+            </div>
+            <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Phone</span>
+                <span className="text-sm text-slate-800 font-semibold">{data.phoneNumber}</span>
+            </div>
+             <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Date of Birth</span>
+                <span className="text-sm text-slate-800 font-semibold">{data.dob}</span>
+            </div>
+            <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Location</span>
+                <span className="text-sm text-slate-800 font-semibold">{data.locality}, {data.city}</span>
+            </div>
+            <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Documents</span>
+                <span className="text-sm text-green-600 font-semibold">{Object.values(data.documents).filter(d => d.status === 'uploaded').length} files uploaded</span>
+            </div>
+            <div className="p-4 flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-600">Guidelines</span>
+                <span className={`text-sm font-semibold ${data.guidelinesAccepted ? 'text-green-600' : 'text-red-600'}`}>
+                    {data.guidelinesAccepted ? 'Accepted' : 'Not Accepted'}
+                </span>
             </div>
         </div>
       </div>
 
-      <div className="flex gap-3 pt-6">
-        <Button variant="outline" className="flex-1" onClick={onBack}>
-          Edit
-        </Button>
-        <Button className="flex-1" onClick={handleSubmit} isLoading={submitting}>
-          Submit Application
-        </Button>
+      <div className="mt-8 flex justify-between">
+        <button onClick={onBack} className="bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
+          Back
+        </button>
+        <button onClick={handleSubmit} disabled={isSubmitting} className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-green-700 transition-colors disabled:bg-green-400">
+          {isSubmitting ? 'Submitting...' : 'Confirm & Submit Application'}
+        </button>
       </div>
     </div>
   );

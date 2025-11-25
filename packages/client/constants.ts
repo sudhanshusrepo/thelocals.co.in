@@ -60,6 +60,7 @@ type ServiceGroup = {
     color: string;
     icon: string;
     categories: WorkerCategory[];
+    helperText: string;
 }
 
 // Reorganized service groups to logically contain all categories
@@ -68,6 +69,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     name: "Home Care & Repair",
     icon: "🏠",
     color: "blue",
+    helperText: "Fix, maintain, and improve your home with trusted professionals.",
     categories: [
       WorkerCategory.PLUMBER, 
       WorkerCategory.ELECTRICIAN, 
@@ -83,6 +85,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
       name: "Cleaning & Logistics",
       icon: "📦",
       color: "orange",
+      helperText: "Keep your space spotless and manage moves with ease.",
       categories: [
         WorkerCategory.MAID,
         WorkerCategory.HOUSE_CLEANING,
@@ -95,6 +98,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     name: "Auto & Transportation",
     icon: "🚗",
     color: "green",
+    helperText: "Keep your vehicles running smoothly and get where you need to go.",
     categories: [
       WorkerCategory.MECHANIC, 
       WorkerCategory.DRIVER, 
@@ -106,6 +110,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     name: "Personal & Family Care",
     icon: "🤝",
     color: "purple",
+    helperText: "Care for your loved ones and yourself with our dedicated experts.",
     categories: [
       WorkerCategory.TUTOR, 
       WorkerCategory.FITNESS_TRAINER, 
@@ -119,6 +124,7 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
       name: "Food & Errands",
       icon: "🍱",
       color: "red",
+      helperText: "Delicious meals and convenient help for your daily tasks.",
       categories: [
         WorkerCategory.COOK, 
         WorkerCategory.TIFFIN_SERVICE,
@@ -130,12 +136,13 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     name: "Professional & Creative",
     icon: "💼",
     color: "yellow",
+    helperText: "Specialized services for your business, events, and technical needs.",
     categories: [
       WorkerCategory.TECH_SUPPORT,
       WorkerCategory.PHOTOGRAPHY,
       WorkerCategory.VIDEOGRAPHY,
       WorkerCategory.DOCUMENTATION_ASSISTANCE,
-      WorkerCategory.SECURITY,
+      Worker.SECURITY,
       WorkerCategory.OTHER
     ]
   }

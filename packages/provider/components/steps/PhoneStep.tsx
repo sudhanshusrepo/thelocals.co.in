@@ -1,139 +1,109 @@
-import React, { useState, useEffect } from 'react';
-import { StepProps } from '../../types';
-import { Button } from '../Button';
-import { Input } from '../Input';
+import React, { useState } from 'react';
+import { ProviderProfile } from '../../types';
 import { useToast } from '../Toast';
-import { useAuth } from '../../contexts/AuthContext';
+import { backend } from '../../services/backend';
+
+interface StepProps {
+  data: ProviderProfile;
+  updateData: (d: Partial<ProviderProfile>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
 
 export const PhoneStep: React.FC<StepProps> = ({ data, updateData, onNext }) => {
   const [phone, setPhone] = useState(data.phoneNumber);
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [timer, setTimer] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const toast = useToast();
-  const { signInWithPhone, verifyOtp } = useAuth();
-
-  useEffect(() => {
-    let interval: number;
-    if (timer > 0) {
-      interval = window.setInterval(() => setTimer((t) => t - 1), 1000);
-    }
-    return () => window.clearInterval(interval);
-  }, [timer]);
 
   const handleSendOtp = async () => {
-    if (phone.length < 10) {
-        toast.error("Please enter a valid 10-digit mobile number.");
+    if (phone.length !== 10) {
+        toast.show('Please enter a valid 10-digit phone number.', {type: 'error'});
         return;
     }
-    setLoading(true);
+    setIsSending(true);
     try {
-        const { error } = await signInWithPhone(`+91${phone}`);
-        if (error) throw error;
-        
+        await backend.auth.sendOtp(phone);
         setOtpSent(true);
-        setTimer(30);
-        toast.success("OTP sent successfully.");
-    } catch (err: any) {
-        console.error("OTP Send Error:", err); // For debugging
-        if (err.message && err.message.includes("not supported")) {
-            toast.error("Phone sign-up is currently unavailable. Please try again later.");
-        } else {
-            toast.error("Failed to send OTP. Please check the number and try again.");
-        }
+        updateData({ phoneNumber: phone });
+        toast.show('OTP sent successfully!', {type: 'success'});
+    } catch (err) {
+        toast.show((err as Error).message, {type: 'error'});
     } finally {
-        setLoading(false);
+        setIsSending(false);
     }
   };
 
-  const handleVerify = async () => {
-    if (otp.length !== 4) return;
-    setLoading(true);
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) {
+        toast.show('Please enter the 6-digit OTP.', {type: 'error'});
+        return;
+    }
+    setIsVerifying(true);
     try {
-        const { error } = await verifyOtp(`+91${phone}`, otp);
-        if (error) throw error;
-
-        updateData({ phoneNumber: phone, isPhoneVerified: true });
-        toast.success("Phone verified successfully!");
+        await backend.auth.verifyOtp(phone, otp);
+        updateData({ isPhoneVerified: true });
+        toast.show('Phone number verified!', {type: 'success'});
         onNext();
-    } catch (err: any) {
-        console.error("OTP Verify Error:", err); // For debugging
-        if (err.message && (err.message.includes("Invalid OTP") || err.message.includes("token has invalid format"))) {
-            toast.error("The OTP you entered is incorrect. Please try again.");
-        } else if (err.message && err.message.includes("expired")) {
-            toast.error("The OTP has expired. Please request a new one.");
-        } else {
-            toast.error("Failed to verify OTP. Please try again.");
-        }
+    } catch (err) {
+        toast.show((err as Error).message, {type: 'error'});
     } finally {
-        setLoading(false);
+        setIsVerifying(false);
     }
   };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-300">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-slate-900">Let's get started</h2>
-        <p className="text-slate-500 mt-2">Enter your mobile number to create your provider account.</p>
+    <div className="flex flex-col h-full">
+      <div className="flex-1">
+        <h2 className="text-xl font-semibold text-slate-700">Verify your Phone Number</h2>
+        <p className="text-slate-500 mt-2">We'll send you a one-time password (OTP) to your mobile number.</p>
+        
+        <div className="mt-6">
+          <label htmlFor="phone" className="block text-sm font-medium text-slate-600">Phone Number</label>
+          <div className="mt-1 flex rounded-md shadow-sm">
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 bg-slate-50 text-slate-500 sm:text-sm">
+              +91
+            </span>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-slate-300" 
+              placeholder="9876543210"
+              disabled={otpSent}
+            />
+          </div>
+        </div>
+
+        {otpSent && (
+            <div className="mt-4 animate-fade-in">
+                <label htmlFor="otp" className="block text-sm font-medium text-slate-600">Enter OTP</label>
+                <input 
+                type="text" 
+                id="otp" 
+                name="otp"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                placeholder="Enter 6-digit OTP"
+                />
+            </div>
+        )}
       </div>
 
-      <div className="space-y-4">
-        <Input
-          label="Mobile Number"
-          type="tel"
-          placeholder="98765 43210"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-          disabled={otpSent}
-          maxLength={10}
-        />
-
+      <div className="mt-8">
         {!otpSent ? (
-          <Button 
-            className="w-full" 
-            onClick={handleSendOtp} 
-            disabled={phone.length < 10}
-            isLoading={loading}
-          >
-            Send OTP
-          </Button>
+          <button onClick={handleSendOtp} disabled={isSending} className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400">
+            {isSending ? 'Sending OTP...' : 'Send OTP'}
+          </button>
         ) : (
-          <div className="space-y-4">
-            <div className="bg-brand-50 p-4 rounded-lg border border-brand-100">
-              <label className="block text-sm font-medium text-brand-900 mb-2">
-                Enter OTP sent to +91 {phone}
-              </label>
-              <div className="flex gap-2 justify-center">
-                <Input
-                  label=""
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="1234"
-                  className="text-center text-xl tracking-widest"
-                  maxLength={4}
-                />
-              </div>
-              <div className="text-xs text-center mt-2 text-brand-700">
-                 {timer > 0 ? `Resend in 00:${timer.toString().padStart(2, '0')}` : <button onClick={handleSendOtp} className="underline font-semibold">Resend OTP</button>}
-              </div>
-            </div>
-            
-            <Button 
-              className="w-full" 
-              onClick={handleVerify}
-              isLoading={loading}
-              disabled={otp.length !== 4}
-            >
-              Verify & Continue
-            </Button>
-            <button 
-              onClick={() => { setOtpSent(false); setOtp(''); }} 
-              className="w-full text-sm text-slate-500 hover:text-slate-800 py-2"
-            >
-              Change Mobile Number
-            </button>
-          </div>
+          <button onClick={handleVerifyOtp} disabled={isVerifying} className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400">
+            {isVerifying ? 'Verifying...' : 'Verify & Proceed'}
+          </button>
         )}
       </div>
     </div>
