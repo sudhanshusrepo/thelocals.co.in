@@ -83,10 +83,10 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   const renderBookingsList = (bookingList: Booking[]) => {
     if (bookingList.length === 0) {
       return (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 text-center border border-slate-100 dark:border-slate-700 shadow-sm">
             <div className="text-6xl mb-4">📭</div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No requests here</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Your active bookings will appear here.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">No requests here</h3>
+            <p className="text-slate-500 dark:text-slate-400 mt-2">Your active bookings will appear here.</p>
         </div>
       );
     }
@@ -100,10 +100,10 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   };
 
   const renderBookingsView = () => {
-      if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading your bookings...</div>;
+      if (loading) return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Loading your bookings...</div>;
       return (
         <div className="animate-fade-in">
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-slate-200 dark:border-slate-700">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                 <TabButton title="Upcoming" count={upcomingBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
                 <TabButton title="Active" count={activeBookings.length} activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -157,12 +157,12 @@ const TabButton: React.FC<{title: Tab, count: number, activeTab: Tab, setActiveT
           className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
             ${
               isActive
-                ? 'border-indigo-500 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300'
             }`
           }
         >
-          {title} <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-200'}`}>{count}</span>
+          {title} <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-teal-100 text-teal-600' : 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-200'}`}>{count}</span>
         </button>
     );
 }
@@ -175,20 +175,20 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
             case 'in_progress': return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
             case 'completed': return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
             case 'cancelled': return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+            default: return 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
         }
     };
     
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md dark:hover:shadow-none transition-shadow relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md dark:hover:shadow-none transition-shadow relative overflow-hidden">
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                     <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl overflow-hidden">
+                     <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xl overflow-hidden">
                          {booking.worker?.imageUrl ? <img src={booking.worker.imageUrl} className="w-full h-full object-cover" /> : '👤'}
                      </div>
                      <div>
-                         <h3 className="font-bold text-gray-900 dark:text-white">{booking.worker?.name || 'Unknown Worker'}</h3>
-                         <p className="text-xs text-gray-500 dark:text-gray-400">{booking.worker?.category} • {new Date(booking.date).toLocaleDateString()}</p>
+                         <h3 className="font-bold text-slate-900 dark:text-white">{booking.worker?.name || 'Unknown Worker'}</h3>
+                         <p className="text-xs text-slate-500 dark:text-slate-400">{booking.worker?.category} • {new Date(booking.date).toLocaleDateString()}</p>
                      </div>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(booking.status)}`}>
@@ -197,7 +197,7 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
             </div>
             
             <div className="flex items-center justify-between mt-4">
-                 <p className="text-sm font-bold text-gray-800 dark:text-gray-100">Total: ${booking.price}</p>
+                 <p className="text-sm font-bold text-slate-800 dark:text-slate-100">Total: ${booking.price}</p>
                 <div className="flex gap-2">
                     {booking.status === 'completed' && (
                         <>
@@ -211,7 +211,7 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
                             ) : (
                                 <button 
                                     onClick={() => setReviewBooking(booking)}
-                                    className="text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-gray-700 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-gray-600 transition-colors"
+                                    className="text-sm font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-teal-100 dark:hover:bg-slate-600 transition-colors"
                                 >
                                     Leave Review
                                 </button>
@@ -219,7 +219,7 @@ const BookingCard: React.FC<{booking: Booking, setPaymentBooking: (b: Booking) =
                         </>
                     )}
                      {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
-                        <button className="text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
+                        <button className="text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-2">
                             <span>📞</span> Call Expert
                         </button>
                     )}

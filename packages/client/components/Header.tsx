@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             
@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
               {!isHome ? (
                   <Link 
                       to="/"
-                      className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-bold group"
+                      className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold group"
                   >
                       <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -72,13 +72,13 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                   <Link to="/" className="flex items-center gap-2">
                        <span className="text-3xl">🏡</span>
-                      <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tighter">thelokals.com</span>
+                      <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tighter">thelokals.com</span>
                   </Link>
               )}
             </div>
 
             <div className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none">
-                <h1 className={`font-bold text-gray-900 dark:text-white transition-opacity duration-300 ${isHome ? 'opacity-0' : 'opacity-100'}`}>
+                <h1 className={`font-bold text-slate-900 dark:text-white transition-opacity duration-300 ${isHome ? 'opacity-0' : 'opacity-100'}`}>
                   {title}
                 </h1>
             </div>
@@ -86,10 +86,10 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsSearchVisible(true)} 
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label="Open search bar"
               >
-                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
               </button>
@@ -97,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
                   href="https://pro.thelokals.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hidden sm:inline text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  className="hidden sm:inline text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                 >
                   For Professionals
                 </a>
@@ -105,17 +105,17 @@ export const Header: React.FC<HeaderProps> = ({
               {user ? (
                 <div className="relative group">
                     <button 
-                      className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="flex items-center gap-2 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
                       aria-label="Open user menu"
                     >
                         <img 
                           src={user.user_metadata.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${user.email}`}
                           alt="avatar" 
-                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 object-cover" />
+                          className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 object-cover" />
                     </button>
 
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 scale-95 group-hover:scale-100 origin-top-right">
-                        <Link to="/dashboard/bookings" className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 scale-95 group-hover:scale-100 origin-top-right">
+                        <Link to="/dashboard/bookings" className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={ICONS.DASHBOARD} /></svg>
                             Dashboard
                         </Link>
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                   <button 
                       onClick={onSignInClick}
-                      className="bg-gray-900 dark:bg-indigo-600 hover:bg-gray-800 dark:hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-gray-200 dark:shadow-none active:scale-[0.98]"
+                      className="bg-slate-900 dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-slate-200 dark:shadow-none active:scale-[0.98]"
                   > 
                       Sign In
                   </button>
@@ -143,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <input
                     type="text"
                     placeholder="What service are you looking for?"
-                    className="w-full p-4 text-lg rounded-xl shadow-2xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full p-4 text-lg rounded-xl shadow-2xl focus:ring-2 focus:ring-teal-500 outline-none"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearch}

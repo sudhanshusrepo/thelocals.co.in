@@ -55,8 +55,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -68,19 +68,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
               <div className="inline-block bg-green-100 dark:bg-green-900/50 p-3 rounded-full mb-4">
                 <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Check your inbox!</h2>
-              <p className="text-gray-500 dark:text-gray-400 mt-2">
-                We've sent a confirmation link to <strong className='text-gray-700 dark:text-gray-300'>{email}</strong>.
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Check your inbox!</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2">
+                We've sent a confirmation link to <strong className='text-slate-700 dark:text-slate-300'>{email}</strong>.
               </p>
-              <button onClick={onClose} className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
+              <button onClick={onClose} className="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-teal-200 dark:shadow-none">
                 Got it
               </button>
             </div>
           ) : (
             <div>
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
                   {isLogin ? 'Enter your details to sign in' : 'Join the lokals to connect with experts'}
                 </p>
               </div>
@@ -93,41 +93,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
               )}
               
               <div className="space-y-4">
-                <button onClick={() => handleOAuthLogin('google')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <button onClick={() => handleOAuthLogin('google')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google logo"/>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Continue with Google</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Continue with Google</span>
                 </button>
-                <button onClick={() => handleOAuthLogin('github')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <button onClick={() => handleOAuthLogin('github')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                    <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5 h-5 dark:invert" alt="GitHub logo"/>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Continue with GitHub</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Continue with GitHub</span>
                 </button>
               </div>
 
               <div className="flex items-center my-6">
-                <hr className="flex-grow border-gray-200 dark:border-gray-600"/>
-                <span className="mx-4 text-sm text-gray-400 dark:text-gray-500">OR</span>
-                <hr className="flex-grow border-gray-200 dark:border-gray-600"/>
+                <hr className="flex-grow border-slate-200 dark:border-slate-600"/>
+                <span className="mx-4 text-sm text-slate-400 dark:text-slate-500">OR</span>
+                <hr className="flex-grow border-slate-200 dark:border-slate-600"/>
               </div>
 
               <form onSubmit={handleAuth} className="space-y-4">
                 {!isLogin && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                    <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" placeholder="John Doe"/>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                    <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="John Doe"/>
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" placeholder="john@example.com"/>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="john@example.com"/>
                 </div>
                 <div>
                   <div className="flex justify-between items-end">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
                   </div>
-                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" placeholder="••••••••" minLength={6}/>
-                  <p className="text-xs text-gray-500 mt-2">Password must be at least 6 characters long.</p>
+                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="••••••••" minLength={6}/>
+                  <p className="text-xs text-slate-500 mt-2">Password must be at least 6 characters long.</p>
                 </div>
-                <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2">
+                <button type="submit" disabled={loading} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-teal-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2">
                   {loading ? (
                     <span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</span>
                   ) : ( isLogin ? 'Sign In' : 'Sign Up' )}
@@ -135,9 +135,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
               </form>
 
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-                  <button onClick={() => { setIsLogin(!isLogin); setError(null); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-700 dark:hover:text-indigo-300">
+                  <button onClick={() => { setIsLogin(!isLogin); setError(null); }} className="text-teal-600 dark:text-teal-400 font-semibold hover:text-teal-700 dark:hover:text-teal-300">
                     {isLogin ? 'Sign up' : 'Sign in'}
                   </button>
                 </p>

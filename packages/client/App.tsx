@@ -35,10 +35,10 @@ const AuthRequiredPlaceholder: React.FC<{ onSignIn: () => void, view: string }> 
     <div className="text-center py-20 animate-fade-in">
         <div className="text-6xl mb-4">🔐</div>
         <h3 className="text-2xl font-bold dark:text-white">Authentication Required</h3>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6">Please sign in to view your {view.toLowerCase()}.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6">Please sign in to view your {view.toLowerCase()}.</p>
         <button
             onClick={onSignIn}
-            className="px-6 py-3 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md"
+            className="px-6 py-3 rounded-lg font-bold bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-md"
         >
             Sign In
         </button>
@@ -89,21 +89,21 @@ const HomePage: React.FC<{
             </Helmet>
             <div className="space-y-4">
                 {Object.values(SERVICE_GROUPS).map((group) => (
-                    <div key={group.name} className="rounded-2xl shadow-sm border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-all duration-300">
+                    <div key={group.name} className="rounded-2xl shadow-sm border dark:border-slate-700 bg-white dark:bg-slate-800 p-4 transition-all duration-300">
                         <button onClick={() => toggleCategory(group.name)} className="w-full flex justify-between items-center">
                             <h2 className="font-bold text-lg dark:text-white">{group.name}</h2>
                             <span className={`transform transition-transform duration-300 ${!collapsedCategories[group.name] ? 'rotate-180' : ''}`}>▼</span>
                         </button>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{group.helperText}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{group.helperText}</p>
                         <div className={`grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 transition-all duration-300 overflow-hidden ${collapsedCategories[group.name] ? 'max-h-0' : 'max-h-full'}`}>
                             {group.categories.map((cat) => (
                                 <button
                                     onClick={() => handleCategorySelect(cat as WorkerCategory)}
                                     key={cat}
-                                    className="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700 p-2 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-600/50 transition-all h-24 group"
+                                    className="flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-700 p-2 rounded-xl hover:bg-teal-100 dark:hover:bg-teal-600/50 transition-all h-24 group"
                                 >
                                     <span className="text-2xl mb-1">{CATEGORY_ICONS[cat]}</span>
-                                    <span className="text-xs font-bold text-center text-gray-600 dark:text-gray-300 group-hover:text-indigo-600">{cat}</span>
+                                    <span className="text-xs font-bold text-center text-slate-600 dark:text-slate-300 group-hover:text-teal-600">{cat}</span>
                                 </button>
                             ))}
                         </div>
@@ -183,14 +183,14 @@ const ResultsPage: React.FC<{ allWorkers: WorkerProfile[], userLocation: Coordin
                 {['relevance', 'rating', 'distance', 'price'].map(sortType => (
                     <button
                         key={sortType}
-                        className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap border ${sortBy === sortType ? 'bg-gray-900 dark:bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800'}`}
+                        className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap border ${sortBy === sortType ? 'bg-slate-900 dark:bg-teal-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800'}`}
                         onClick={() => setSortBy(sortType)}
                     >
                         {sortType.charAt(0).toUpperCase() + sortType.slice(1)}
                     </button>
                 ))}
             </div>
-            <p className="text-gray-500 text-sm my-4 font-medium">{filteredAndSortedWorkers.length} experts found</p>
+            <p className="text-slate-500 text-sm my-4 font-medium">{filteredAndSortedWorkers.length} experts found</p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAndSortedWorkers.map(worker => (
                     <WorkerCard key={worker.id} worker={worker} distanceKm={worker.distanceKm} onConnect={setSelectedWorker} />
@@ -298,7 +298,7 @@ const MainLayout: React.FC = () => {
 
     return (
         <SkeletonTheme baseColor="#dcfce7" highlightColor="#bbf7d0">
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-20">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans pb-20">
                 <BookingModal worker={selectedWorker} onClose={() => setSelectedWorker(null)} onAuthReq={() => { setSelectedWorker(null); setShowAuthModal(true); }} />
                 {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
@@ -319,7 +319,7 @@ const MainLayout: React.FC = () => {
                     </Routes>
                 </main>
 
-                <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex justify-around max-w-5xl mx-auto rounded-t-2xl shadow-lg">
+                <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t dark:border-slate-700 flex justify-around max-w-5xl mx-auto rounded-t-2xl shadow-lg">
                     <NavLink to="/" label="Home" />
                     <NavLink to="/dashboard/bookings" label="Bookings" />
                     <NavLink to="/dashboard/profile" label="Profile" />
@@ -336,7 +336,7 @@ const NavLink: React.FC<{ to: string, label: string }> = ({ to, label }) => {
     return (
         <Link
             to={to}
-            className={`flex flex-col items-center justify-center flex-1 p-3 text-sm font-semibold transition-colors ${isActive ? 'text-indigo-600' : 'text-gray-500'}`}>
+            className={`flex flex-col items-center justify-center flex-1 p-3 text-sm font-semibold transition-colors ${isActive ? 'text-teal-600' : 'text-slate-500'}`}>
             {label}
         </Link>
     )
