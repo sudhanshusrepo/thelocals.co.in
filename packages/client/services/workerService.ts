@@ -18,27 +18,42 @@ const selectQuery = `
 `;
 
 /**
- * Converts a category string from the database (e.g., 'house_cleaning') to the corresponding
- * frontend WorkerCategory enum value (e.g., 'House Cleaning'). This is the definitive fix
- * for the category filtering issue.
+ * Converts a category string from the database (e.g., 'house_cleaning', 'doctor_nurse') 
+ * to the corresponding frontend WorkerCategory enum value (e.g., 'House Cleaning', 'Doctor/Nurse').
+ * This is the definitive fix for the category filtering issue, handling underscores, slashes, and ampersands.
  * @param dbCategory The raw category string from the database.
  * @returns The matching WorkerCategory enum value, or WorkerCategory.OTHER if no match is found.
  */
 const toWorkerCategory = (dbCategory: string): WorkerCategory => {
-    // Create a dynamic map from a "cleaned" string (lowercase, space for underscore) to the enum value.
+    // Create a dynamic map from a "cleaned" string to the enum value for robust matching.
     const categoryMap: { [key: string]: WorkerCategory } = {};
     for (const key in WorkerCategory) {
         const enumValue = WorkerCategory[key as keyof typeof WorkerCategory];
-        // Normalize the enum value to match the expected DB format (lowercase, spaces for underscores)
-        const cleanedValue = enumValue.toLowerCase().replace(/&/g, 'and');
+        // Normalize the enum value to match the expected DB format:
+        // 1. Lowercase
+        // 2. Replace '/' and '&' with spaces
+        // 3. Replace multiple spaces with a single space
+        const cleanedValue = enumValue
+            .toLowerCase()
+            .replace(/\/|&/g, ' ') 
+            .replace(/\s+/g, ' ');
         categoryMap[cleanedValue] = enumValue;
     }
 
-    const cleanedDbCategory = dbCategory.toLowerCase().replace(/_/g, ' ');
+    // Clean the database category string in the same way
+    const cleanedDbCategory = dbCategory
+        .toLowerCase()
+        .replace(/_/g, ' ');
 
     // Find the matching enum value in our map
     const matchedCategory = Object.keys(categoryMap).find(key => key === cleanedDbCategory);
-    return matchedCategory ? categoryMap[matchedCategory] : WorkerCategory.OTHER;
+    
+    if (matchedCategory) {
+        return categoryMap[matchedCategory];
+    }
+
+    console.warn(`Unmatched category from DB: "${dbCategory}". Defaulting to "Other".`);
+    return WorkerCategory.OTHER;
 };
 
 
@@ -46,9 +61,9 @@ const toWorkerCategory = (dbCategory: string): WorkerCategory => {
 const transformWorker = (worker: any): WorkerProfile => ({
   id: worker.id,
   name: worker.name,
-  // *** CRITICAL FIX ****
-  // Use the mapping function to ensure the category from the DB is correctly
-  // translated into the frontend enum, resolving the filtering mismatch.
+  // *** DEFINITIVE FIX ****
+  // Use the robust mapping function to ensure the category from the DB is correctly
+  // translated into the frontend enum, resolving the filtering mismatch permanently.
   category: toWorkerCategory(worker.category),
   description: worker.description,
   price: worker.price_per_hour, // Map from database column
@@ -133,7 +148,10 @@ export const workerService = {
       
     const dbPayload: any = {};
     if (updates.name !== undefined) dbPayload.name = updates.name;
-    if (updates.category !== undefined) dbPayload.category = updates.category.toLowerCase().replace(/\s/g, '_');
+    // When updating, convert the frontend category back to the database format
+    if (updates.category !== undefined) {
+         dbPayload.category = updates.category.toLowerCase().replace(/\s+|\//g, '_').replace(/&/g, 'and');
+    }
     if (updates.price !== undefined) dbPayload.price_per_hour = updates.price;
     if (updates.description !== undefined) dbPayload.description = updates.description;
     if (updates.location !== undefined) {
