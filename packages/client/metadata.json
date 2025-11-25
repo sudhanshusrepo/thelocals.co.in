@@ -1,7 +1,5 @@
-{
-  "name": "thelocals.co",
-  "description": "Connect with top-rated local professionals like plumbers, maids, and mechanics instantly. Smart search powered by AI matches you with the best experts nearby.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}
+      {
+        "name": "thelokals.co",
+        "description": "Connect with top-rated local professionals like plumbers, maids, and mechanics instantly. Smart search powered by AI matches you with the best experts nearby.",
+        "requestFramePermissions": []
+      }

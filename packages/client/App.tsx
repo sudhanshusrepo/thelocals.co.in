@@ -36,6 +36,8 @@ const MainLayout: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<WorkerCategory | null>(null);
   const [activeFilters, setActiveFilters] = useState<{ sortBy: string, maxDistance: number }>({ sortBy: 'relevance', maxDistance: 50 });
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [locationPermission, setLocationPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+  const [showLocationModal, setShowLocationModal] = useState(false);
   
   // Data State
   const [allWorkers, setAllWorkers] = useState<WorkerProfile[]>([]);
@@ -62,23 +64,56 @@ const MainLayout: React.FC = () => {
     databaseService.setupNewUserTrigger();
     databaseService.removeInsertPolicy();
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.warn("Geolocation denied or failed, using default center", error);
-          setUserLocation(DEFAULT_CENTER);
-        }
-      );
-    } else {
-      setUserLocation(DEFAULT_CENTER);
-    }
   }, []);
+
+  const requestLocation = (): Promise<Coordinates> => {
+    return new Promise((resolve) => {
+        if (locationPermission === 'granted' && userLocation) {
+            return resolve(userLocation);
+        }
+
+        if (locationPermission === 'denied') {
+            return resolve(DEFAULT_CENTER);
+        }
+
+        setShowLocationModal(true);
+
+        const handleAllow = () => {
+            setShowLocationModal(false);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
+                        setUserLocation(coords);
+                        setLocationPermission('granted');
+                        resolve(coords);
+                    },
+                    (error) => {
+                        console.warn("Geolocation denied, using default center", error);
+                        setUserLocation(DEFAULT_CENTER);
+                        setLocationPermission('denied');
+                        resolve(DEFAULT_CENTER);
+                    }
+                );
+            } else {
+                setUserLocation(DEFAULT_CENTER);
+                setLocationPermission('denied');
+                resolve(DEFAULT_CENTER);
+            }
+        };
+
+        const handleDeny = () => {
+            setShowLocationModal(false);
+            setUserLocation(DEFAULT_CENTER);
+            setLocationPermission('denied');
+            resolve(DEFAULT_CENTER);
+        };
+
+        // This is a bit of a hack to pass the handlers to the modal
+        (window as any).handleAllowLocation = handleAllow;
+        (window as any).handleDenyLocation = handleDeny;
+    });
+  }
 
   // Search Handler
   const handleSearch = async (e?: React.FormEvent) => {
@@ -95,6 +130,7 @@ const MainLayout: React.FC = () => {
     setIsSearching(true);
     
     try {
+      const center = await requestLocation();
       let categoryToFilter = selectedCategory;
       let keywords: string[] = [];
       let sortBy = activeFilters.sortBy;
@@ -108,8 +144,6 @@ const MainLayout: React.FC = () => {
       }
 
       // Filter Logic
-      const center = userLocation || DEFAULT_CENTER;
-      
       const filtered = allWorkers.map(worker => {
         const dist = getDistanceFromLatLonInKm(center.lat, center.lng, worker.location.lat, worker.location.lng);
         return { ...worker, _distance: dist };
@@ -160,14 +194,15 @@ const MainLayout: React.FC = () => {
     }
   };
 
-  const handleCategoryClick = (cat: WorkerCategory) => {
+  const handleCategoryClick = async (cat: WorkerCategory) => {
     setSelectedCategory(cat);
     setSearchQuery('');
     setIsSearching(true);
     
+    const center = await requestLocation();
+
     // Simulating search delay for UX
     setTimeout(() => {
-        const center = userLocation || DEFAULT_CENTER;
         const filtered = allWorkers.map(w => ({
             ...w,
             _distance: getDistanceFromLatLonInKm(center.lat, center.lng, w.location.lat, w.location.lng)
@@ -203,6 +238,20 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-20 selection:bg-indigo-100 dark:selection:bg-indigo-900 transition-colors duration-300">
+        {showLocationModal && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 max-w-sm w-full text-center">
+                    <div className="text-5xl mb-4">📍</div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Enable Location Services</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">To find the best professionals near you, The Lokals needs access to your device's location.</p>
+                    <div className="flex gap-4">
+                        <button onClick={() => (window as any).handleDenyLocation()} className="flex-1 px-4 py-3 rounded-lg font-bold bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">Not Now</button>
+                        <button onClick={() => (window as any).handleAllowLocation()} className="flex-1 px-4 py-3 rounded-lg font-bold bg-indigo-600 text-white">Allow</button>
+                    </div>
+                </div>
+            </div>
+        )}
+
       {/* Modals */}
       <BookingModal 
         worker={selectedWorker} 
