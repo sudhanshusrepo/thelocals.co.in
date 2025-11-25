@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../../core/services/supabase';
@@ -51,10 +52,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { data, error } = await supabase
           .from('customers')
           .select('*')
-          .eq('id', user.id)
-          .single();
+          .eq('id', user.id);
         
-        if (data) setCustomer(data as Customer);
+        if (data && data.length > 0) {
+          setCustomer(data[0] as Customer);
+        } else if (!error) {
+          // No customer found, so create one
+          const { data: newCustomer, error: createError } = await supabase
+            .from('customers')
+            .insert([{ id: user.id, email: user.email }])
+            .select();
+          
+          if (newCustomer) {
+            setCustomer(newCustomer[0] as Customer);
+          }
+          if (createError) {
+            console.error('Error creating customer', createError);
+          }
+        }
         if (error) console.error('Error fetching customer', error);
       };
       fetchCustomer();
