@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { WorkerCard } from './components/WorkerCard';
@@ -10,6 +11,7 @@ import { WorkerCategory, WorkerProfile, Coordinates } from './types';
 import { interpretSearchQuery } from './services/geminiService';
 import { workerService } from './services/workerService';
 import { databaseService } from './services/databaseService';
+import SearchBar from './components/SearchBar';
 
 // Haversine formula for distance
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -115,11 +117,9 @@ const MainLayout: React.FC = () => {
   }
 
   // Search Handler
-  const handleSearch = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    
-    if (!searchQuery.trim() && !selectedCategory) {
-         if(selectedCategory) {
+  const handleSearch = async (query: string, category: WorkerCategory | null) => {
+    if (!query.trim() && !category) {
+         if(category) {
              setView('results');
              return;
          }
@@ -127,17 +127,19 @@ const MainLayout: React.FC = () => {
     }
 
     setIsSearching(true);
+    setSearchQuery(query);
+    setSelectedCategory(category);
     
     try {
       const center = await requestLocation();
-      let categoryToFilter = selectedCategory;
+      let categoryToFilter = category;
       let keywords: string[] = [];
       let sortBy = activeFilters.sortBy;
 
       // If there is a text query, use Gemini to understand intent
-      if (searchQuery.trim()) {
-        const intent = await interpretSearchQuery(searchQuery);
-        categoryToFilter = intent.category || null;
+      if (query.trim()) {
+        const intent = await interpretSearchQuery(query);
+        categoryToFilter = intent.category || category;
         keywords = intent.keywords || [];
         if (intent.sortBy) sortBy = intent.sortBy;
       }
@@ -166,7 +168,7 @@ const MainLayout: React.FC = () => {
       // Sort Logic
       filtered.sort((a, b) => {
         if (sortBy === 'price') return a.price - b.price;
-        if (sortBy === 'rating') return b.rating - a.rating;
+        if (sortBy === 'rating') return b.rating - b.rating;
         if (sortBy === 'distance') return (a as any)._distance - (b as any)._distance;
         
         // Relevance default: mix of distance, rating, and STATUS
@@ -281,31 +283,7 @@ const MainLayout: React.FC = () => {
         {view === 'home' && (
           <div className="space-y-8 animate-fade-in-up">
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto group-focus-within:scale-105 transition-transform duration-300">
-              <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="What do you need help with today?" 
-                className="relative w-full pl-14 pr-32 py-5 rounded-2xl text-gray-900 dark:text-white bg-white dark:bg-gray-800 shadow-xl outline-none font-semibold text-lg placeholder:text-gray-400 dark:placeholder:text-gray-500"
-              />
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                     <path strokeLinecap="round" strokeLinejoin="round" d={ICONS.SEARCH} />
-                </svg>
-              </div>
-              <button 
-                type="submit"
-                className="absolute right-2.5 top-2.5 bottom-2.5 bg-gray-900 dark:bg-indigo-600 hover:bg-gray-800 dark:hover:bg-indigo-700 text-white px-6 rounded-xl font-bold transition-colors flex items-center gap-2"
-              >
-                {isSearching ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                    <>Search</>
-                )}
-              </button>
-            </form>
+            <SearchBar onSearch={handleSearch} />
 
             {/* Service Groups */}
             <div className="space-y-4">
