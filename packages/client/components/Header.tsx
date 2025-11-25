@@ -84,7 +84,11 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="flex items-center gap-4">
-              <button onClick={() => setIsSearchVisible(true)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+              <button 
+                onClick={() => setIsSearchVisible(true)} 
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Open search bar"
+              >
                   <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -102,6 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="relative group">
                     <button 
                       className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                      aria-label="Open user menu"
                     >
                         <img 
                           src={user.user_metadata.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${user.email}`}
