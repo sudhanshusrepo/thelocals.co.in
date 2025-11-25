@@ -222,8 +222,6 @@ const DashboardPage: React.FC<{isLoading: boolean}> = ({isLoading}) => {
 const MainLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { category } = useParams<{ category: string }>();
-    const { view: dashboardView } = useParams<{ view: string }>();
 
     const [allWorkers, setAllWorkers] = useState<WorkerProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -282,9 +280,17 @@ const MainLayout: React.FC = () => {
 
     const getHeaderTitle = () => {
         const path = location.pathname;
-        if (path.startsWith('/category')) return category?.toUpperCase();
-        if (path.startsWith('/dashboard')) return dashboardView?.toUpperCase();
-        if (path.startsWith('/search')) return 'Search Results';
+        const pathParts = path.split('/');
+
+        if (path.startsWith('/category/') && pathParts.length >= 3) {
+            return pathParts[2].toUpperCase();
+        }
+        if (path.startsWith('/dashboard/') && pathParts.length >= 3) {
+            return pathParts[2].toUpperCase();
+        }
+        if (path.startsWith('/search')) {
+            return 'Search Results';
+        }
         return 'Thelokals.com';
     }
 
