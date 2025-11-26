@@ -96,7 +96,10 @@ const MainApp = () => {
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 bg-white sticky top-0 z-20 flex justify-between items-center">
-            <h1 className="text-lg font-bold text-slate-800">Registration</h1>
+            <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="The Lokals Logo" className="h-10 w-auto" />
+                <h1 className="text-lg font-bold text-slate-800">Registration</h1>
+            </div>
              <div className="flex items-center gap-2">
                  <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
