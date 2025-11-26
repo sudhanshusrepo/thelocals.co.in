@@ -304,6 +304,12 @@ const MainLayout: React.FC = () => {
     return (
         <SkeletonTheme baseColor="#dcfce7" highlightColor="#bbf7d0">
             <div className="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans pb-20">
+                <Helmet>
+                    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png" />
+                    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png" />
+                    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png" />
+                    <link rel="manifest" href="/assets/images/site.webmanifest" />
+                </Helmet>
                 <BookingModal worker={selectedWorker} onClose={() => setSelectedWorker(null)} onAuthReq={() => { setSelectedWorker(null); setShowAuthModal(true); }} />
                 {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
