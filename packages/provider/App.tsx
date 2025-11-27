@@ -9,7 +9,7 @@ import { ReviewStep } from './components/steps/ReviewStep';
 import { ProviderProfile, RegistrationStatus, DocType } from './types';
 import { backend } from './services/backend';
 import { ToastProvider, useToast } from './components/Toast';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const initialData: ProviderProfile = {
   phoneNumber: '',
@@ -35,6 +35,7 @@ const MainApp = () => {
   const [formData, setFormData] = useState<ProviderProfile>(initialData);
   const [isRestoring, setIsRestoring] = useState(true);
   const toast = useToast();
+  const auth = useAuth();
 
   // Restore draft on load
   useEffect(() => {
@@ -75,7 +76,7 @@ const MainApp = () => {
   const nextStep = () => setStep(s => Math.min(s + 1, 5));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
-  if (isRestoring) {
+  if (isRestoring || auth.loading) {
       return (
           <div className="min-h-screen bg-white flex items-center justify-center">
               <div className="animate-pulse flex flex-col items-center">
