@@ -164,7 +164,7 @@ export const bookingService = {
       });
 
     if (error) {
-      logger.error('Error finding nearby providers', { error, serviceId, lat, lng,.distance });
+      logger.error('Error finding nearby providers', { error, serviceId, lat, lng, distance });
       throw error;
     }
     return data;
