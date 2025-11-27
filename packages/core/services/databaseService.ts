@@ -1,5 +1,17 @@
 import { supabase } from './supabase';
 
+/**
+ * @module databaseService
+ * @description A service for managing database schema, triggers, and policies.
+ */
+
+/**
+ * Sets up a trigger to automatically create a new customer profile when a new user signs up.
+ * This function creates a PostgreSQL function `handle_new_user` and a trigger `on_auth_user_created`.
+ * The trigger fires after a new user is inserted into the `auth.users` table.
+ * It checks if the function and trigger already exist to prevent errors.
+ * @returns {Promise<void>}
+ */
 const setupNewUserTrigger = async () => {
     // Check if the function already exists
     const { data: functions, error: f_error } = await supabase
@@ -52,6 +64,11 @@ const setupNewUserTrigger = async () => {
     }
 };
 
+/**
+ * Removes the "Allow individual insert access" policy from the `customers` table.
+ * This is a security measure to prevent direct inserts into the `customers` table, as user creation is handled by the `handle_new_user` trigger.
+ * @returns {Promise<void>}
+ */
 const removeInsertPolicy = async () => {
     // List all policies on the 'customers' table
     const { data, error } = await supabase.rpc('run_sql', {

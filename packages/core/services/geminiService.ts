@@ -1,14 +1,28 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { SearchIntent, WorkerCategory } from "../types";
+import { logger } from "./logger";
+
+/**
+ * @module geminiService
+ * @description A service for interacting with the Google Gemini API to interpret user search queries.
+ */
 
 // Helper to safely get API key
 const getApiKey = () => import.meta.env.VITE_GEMINI_API_KEY || '';
 
+/**
+ * Interprets a user's search query using the Google Gemini API to extract structured search intent.
+ * This includes identifying the most relevant worker category, extracting keywords, determining sorting preferences (price, rating, distance), and detecting urgency.
+ * If the API key is not available or the API call fails, it returns a default search intent based on the query string.
+ *
+ * @param {string} query - The user's search query.
+ * @returns {Promise<SearchIntent>} A structured search intent object.
+ */
 export const interpretSearchQuery = async (query: string): Promise<SearchIntent> => {
   try {
     const apiKey = getApiKey();
     if (!apiKey) {
-        console.warn("No API Key found, returning default search intent");
+        logger.warn("No API Key found, returning default search intent");
         return {
             category: null,
             keywords: [query],
@@ -67,7 +81,7 @@ export const interpretSearchQuery = async (query: string): Promise<SearchIntent>
     throw new Error("Empty response from Gemini");
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    logger.error("Gemini API Error", { error, query });
     // Fallback intent
     return {
       category: null,
