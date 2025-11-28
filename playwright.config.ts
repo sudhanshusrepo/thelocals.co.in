@@ -38,36 +38,44 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    /* Regression Suite Environments */
+    {
+      name: 'st',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.VITE_API_URL || 'https://st-api.thelokals.com',
+      },
+    },
+    {
+      name: 'uat',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.VITE_API_URL || 'https://uat-api.thelokals.com',
+      },
+    },
+    {
+      name: 'preprod',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.VITE_API_URL || 'https://preprod-api.thelokals.com',
+      },
+    },
+    /* Performance Testing */
+    {
+      name: 'performance',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: '**/performance/*.spec.ts',
+    },
   ],
 
   /* Run your local dev server before starting the tests */

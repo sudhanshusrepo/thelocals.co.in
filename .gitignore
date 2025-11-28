@@ -30,3 +30,18 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Test Reports (Local Only)
+*_report*.json
+st_report*.json
+performance_report*.json
+uat_report*.json
+preprod_report*.json
+
+# Environment Files for Testing (Local Only)
+.env.st
+.env.uat
+.env.preprod
+
+# Test Scripts (Local Only)
+scripts/test-*.sh
