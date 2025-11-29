@@ -81,20 +81,37 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
   const activeBookings = bookings.filter(b => b.status?.toUpperCase() === 'IN_PROGRESS');
   const pastBookings = bookings.filter(b => b.status?.toUpperCase() === 'COMPLETED' || b.status?.toUpperCase() === 'CANCELLED');
 
+  const DynamicCalendarIcon = () => {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.toLocaleString('default', { month: 'short' }).toUpperCase();
+
+    return (
+      <div className="w-20 h-20 mx-auto mb-4 flex flex-col bg-white dark:bg-slate-700 rounded-xl shadow-md border border-slate-200 dark:border-slate-600 overflow-hidden">
+        <div className="bg-red-500 text-white text-xs font-bold py-1.5 uppercase tracking-wider">
+          {month}
+        </div>
+        <div className="flex-1 flex items-center justify-center text-3xl font-bold text-slate-800 dark:text-white">
+          {day}
+        </div>
+      </div>
+    );
+  };
+
   const getEmptyState = (tab: Tab) => {
     const messages = {
       Upcoming: {
-        icon: '📅',
+        icon: <DynamicCalendarIcon />,
         title: 'No upcoming bookings',
         text: 'When you book a service, it will show up here.'
       },
       Active: {
-        icon: '🏃',
+        icon: <div className="text-6xl mb-4">🏃</div>,
         title: 'No active jobs',
         text: 'Services that are currently in progress will be displayed here.'
       },
       Past: {
-        icon: '🗂️',
+        icon: <div className="text-6xl mb-4">🗂️</div>,
         title: 'No past bookings',
         text: 'Your completed or cancelled bookings will be listed in this section.'
       }
@@ -102,7 +119,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
     const { icon, title, text } = messages[tab];
     return (
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 text-center border border-slate-100 dark:border-slate-700 shadow-sm">
-        <div className="text-6xl mb-4">{icon}</div>
+        {icon}
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
         <p className="text-slate-500 dark:text-slate-400 mt-2">{text}</p>
       </div>

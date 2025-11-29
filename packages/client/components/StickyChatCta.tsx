@@ -59,7 +59,7 @@ export const StickyChatCta: React.FC<StickyChatCtaProps> = ({ serviceCategory, o
     return (
         <ChatInput
             onSend={handleInputSend}
-            className="mb-16 sm:mb-0 transition-transform duration-300 ease-in-out transform translate-y-0 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+            className="mb-20 sm:mb-0 transition-transform duration-300 ease-in-out transform translate-y-0 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
             placeholder={placeholder || (serviceCategory ? `Tell us about your ${serviceCategory} needs...` : "Ask our AI to find a professional...")}
         />
     );
