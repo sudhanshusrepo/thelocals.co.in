@@ -1,20 +1,25 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Client
 
-# Run and deploy your AI Studio app
+This package contains the client-facing web application for The Lokals Platform. The application is built using React and Vite. It allows customers to search for and book services from local providers.
 
-This contains everything you need to run your app locally.
+## Getting Started
 
-View your app in AI Studio: https://ai.studio/apps/drive/1QZVqBajjLDcTVsIH4AQzndDRTVu-t7Ba
+To get started with the client application, you will need to have [Node.js](https://nodejs.org/en/) and [pnpm](https://pnpm.io/) installed.
 
-## Run Locally
+Once you have these installed, you can start the development server by running the following command:
 
-**Prerequisites:**  Node.js
+```bash
+pnpm dev
+```
 
+This will start the development server at `http://localhost:5173`.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Building the Application
+
+To build the application for production, you can run the following command:
+
+```bash
+pnpm build
+```
+
+This will create a `dist` directory with the production-ready assets.
