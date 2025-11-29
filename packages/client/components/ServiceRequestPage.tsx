@@ -8,10 +8,13 @@ import { LiveSearch } from './LiveSearch';
 import { CATEGORY_DISPLAY_NAMES, LOWERCASE_TO_WORKER_CATEGORY } from '../constants';
 
 
+import { useGeolocation } from '../hooks/useGeolocation';
+
 export const ServiceRequestPage: React.FC = () => {
     const { category } = useParams<{ category: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { location, getLocation, error: locationError, isLoading: isLocationLoading } = useGeolocation();
     const [userInput, setUserInput] = useState('');
     const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +28,8 @@ export const ServiceRequestPage: React.FC = () => {
         try {
             const result = await estimateService(userInput, selectedCategory);
             setAnalysis(result);
+            // Start fetching location in background when analysis starts
+            getLocation();
         } catch (error) {
             console.error('AI analysis failed:', error);
             alert('Failed to get AI analysis. Please try again.');
@@ -38,6 +43,13 @@ export const ServiceRequestPage: React.FC = () => {
             // Should show auth modal if not logged in
             return;
         }
+
+        if (!location) {
+            getLocation();
+            alert("We need your location to find nearby providers. Please allow location access.");
+            return;
+        }
+
         setIsBooking(true);
         try {
             const { bookingId } = await bookingService.createAIBooking({
@@ -46,7 +58,7 @@ export const ServiceRequestPage: React.FC = () => {
                 requirements: { description: userInput },
                 aiChecklist: analysis.checklist,
                 estimatedCost: analysis.estimatedCost,
-                location: { lat: 0, lng: 0 }, // Placeholder
+                location: location,
                 address: {},
                 notes: `AI Analysis Reasoning: ${analysis.reasoning}`
             });

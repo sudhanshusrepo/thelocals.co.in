@@ -46,7 +46,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     }
   };
 
-  const handleOAuthLogin = async (provider: 'google' | 'github') => {
+  const handleOAuthLogin = async (provider: 'google') => {
     const { error } = await supabase.auth.signInWithOAuth({ provider });
     if (error) {
       setError(error.message);
@@ -91,46 +91,42 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-4">
                 <button onClick={() => handleOAuthLogin('google')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google logo"/>
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google logo" />
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Continue with Google</span>
-                </button>
-                <button onClick={() => handleOAuthLogin('github')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                   <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5 h-5 dark:invert" alt="GitHub logo"/>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Continue with GitHub</span>
                 </button>
               </div>
 
               <div className="flex items-center my-6">
-                <hr className="flex-grow border-slate-200 dark:border-slate-600"/>
+                <hr className="flex-grow border-slate-200 dark:border-slate-600" />
                 <span className="mx-4 text-sm text-slate-400 dark:text-slate-500">OR</span>
-                <hr className="flex-grow border-slate-200 dark:border-slate-600"/>
+                <hr className="flex-grow border-slate-200 dark:border-slate-600" />
               </div>
 
               <form onSubmit={handleAuth} className="space-y-4">
                 {!isLogin && (
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
-                    <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="John Doe"/>
+                    <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="John Doe" />
                   </div>
                 )}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="john@example.com"/>
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="john@example.com" />
                 </div>
                 <div>
                   <div className="flex justify-between items-end">
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
                   </div>
-                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="••••••••" minLength={6}/>
+                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="••••••••" minLength={6} />
                   <p className="text-xs text-slate-500 mt-2">Password must be at least 6 characters long.</p>
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-teal-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2">
                   {loading ? (
                     <span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</span>
-                  ) : ( isLogin ? 'Sign In' : 'Sign Up' )}
+                  ) : (isLogin ? 'Sign In' : 'Sign Up')}
                 </button>
               </form>
 

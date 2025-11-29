@@ -1,6 +1,7 @@
 
 import { supabase } from './supabase';
 import { Booking, BookingStatus, LiveBooking, LiveBookingStatus, Service } from '../types';
+import { BookingWithWorkerResponse, NearbyProviderResponse } from '../databaseTypes';
 import { logger } from './logger';
 
 /**
@@ -83,7 +84,7 @@ export const bookingService = {
 
     return () => supabase.removeChannel(channel);
   },
-  
+
   /**
    * Creates a new booking.
    * @param {string} workerId - The ID of the worker being booked.
@@ -135,20 +136,26 @@ export const bookingService = {
     }
 
     // Map the nested worker data to match WorkerProfile structure
-    return data.map((b: any) => ({
-        ...b,
-        worker: b.workers ? {
-            ...b.workers,
-            reviewCount: b.workers.review_count,
-            experienceYears: b.workers.experience_years,
-            priceUnit: b.workers.price_unit,
-            imageUrl: b.workers.image_url,
-            isVerified: b.workers.is_verified,
-            location: {
-                lat: b.workers.location_lat,
-                lng: b.workers.location_lng
-            }
-        } : undefined
+    return (data as unknown as BookingWithWorkerResponse[]).map((b) => ({
+      ...b,
+      worker: b.workers ? {
+        id: b.workers.id,
+        name: b.workers.name,
+        category: b.workers.category as any,
+        description: b.workers.description,
+        price: b.workers.price,
+        priceUnit: b.workers.price_unit,
+        rating: b.workers.rating,
+        status: b.workers.status as any,
+        imageUrl: b.workers.image_url,
+        expertise: b.workers.expertise,
+        reviewCount: b.workers.review_count,
+        isVerified: b.workers.is_verified,
+        location: {
+          lat: b.workers.location_lat,
+          lng: b.workers.location_lng
+        }
+      } : undefined
     }));
   },
 
@@ -180,10 +187,10 @@ export const bookingService = {
    */
   async updateBookingStatus(bookingId: string, status: BookingStatus) {
     const { error } = await supabase
-        .from('bookings')
-        .update({ status })
-        .eq('id', bookingId);
-    
+      .from('bookings')
+      .update({ status })
+      .eq('id', bookingId);
+
     if (error) {
       logger.error('Error updating booking status', { error, bookingId, status });
       throw error;
@@ -200,23 +207,23 @@ export const bookingService = {
    * @throws {Error} If the review submission fails.
    */
   async submitReview(bookingId: string, workerId: string, userId: string, rating: number, comment: string) {
-      const { error } = await supabase
-        .from('reviews')
-        .insert({
-            booking_id: bookingId,
-            worker_id: workerId,
-            user_id: userId,
-            rating,
-            comment
-        });
-      
-      if (error) {
-        logger.error('Error submitting review', { error, bookingId, workerId });
-        throw error;
-      }
+    const { error } = await supabase
+      .from('reviews')
+      .insert({
+        booking_id: bookingId,
+        worker_id: workerId,
+        user_id: userId,
+        rating,
+        comment
+      });
 
-      // Ensure booking is marked as completed if it wasn't already (though flow usually ensures this)
-      await this.updateBookingStatus(bookingId, 'completed');
+    if (error) {
+      logger.error('Error submitting review', { error, bookingId, workerId });
+      throw error;
+    }
+
+    // Ensure booking is marked as completed if it wasn't already (though flow usually ensures this)
+    await this.updateBookingStatus(bookingId, 'completed');
   },
 
   // NEW LIVE BOOKING SYSTEM FUNCTIONS
@@ -227,10 +234,10 @@ export const bookingService = {
    * @param {number} lat - The latitude of the user's location.
    * @param {number} lng - The longitude of the user's location.
    * @param {number} distance - The search radius in meters.
-   * @returns {Promise<any[]>} A list of nearby providers.
+   * @returns {Promise<NearbyProviderResponse[]>} A list of nearby providers.
    * @throws {Error} If the database query fails.
    */
-  async findNearbyProviders(serviceId: string, lat: number, lng: number, distance: number): Promise<any[]> {
+  async findNearbyProviders(serviceId: string, lat: number, lng: number, distance: number): Promise<NearbyProviderResponse[]> {
     const { data, error } = await supabase
       .rpc('find_nearby_providers', {
         service_id: serviceId,
@@ -243,7 +250,7 @@ export const bookingService = {
       logger.error('Error finding nearby providers', { error, serviceId, lat, lng, distance });
       throw error;
     }
-    return data;
+    return data as NearbyProviderResponse[];
   },
 
   /**

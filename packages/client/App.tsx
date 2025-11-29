@@ -18,6 +18,7 @@ import { GroupDetailPage } from './components/GroupDetailPage';
 import { ServiceRequestPage } from './components/ServiceRequestPage';
 import BookingConfirmation from './components/BookingConfirmation';
 import { HomePage } from './components/HomePage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const AuthRequiredPlaceholder: React.FC<{ onSignIn: () => void, view: string }> = ({ onSignIn, view }) => (
     <div className="text-center py-20 animate-fade-in">
@@ -158,7 +159,7 @@ const MainLayout: React.FC = () => {
                 />
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                     {isLoading ? <HomeSkeleton /> : (
+                    {isLoading ? <HomeSkeleton /> : (
                         <Routes>
                             <Route path="/" element={<HomePage />} />
                             <Route path="/group/:groupId" element={<GroupDetailPage />} />
@@ -167,7 +168,7 @@ const MainLayout: React.FC = () => {
                             <Route path="/dashboard/:view" element={<DashboardPage isLoading={isLoading} />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
-                     )}
+                    )}
                 </main>
 
                 <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t dark:border-slate-700 flex justify-around max-w-7xl mx-auto rounded-t-2xl shadow-lg">
@@ -195,10 +196,12 @@ const NavLink: React.FC<{ to: string, label: string }> = ({ to, label }) => {
 
 export default function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
-                <MainLayout />
-            </BrowserRouter>
-        </AuthProvider>
+        <ErrorBoundary>
+            <AuthProvider>
+                <BrowserRouter>
+                    <MainLayout />
+                </BrowserRouter>
+            </AuthProvider>
+        </ErrorBoundary>
     );
 }

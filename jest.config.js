@@ -9,7 +9,13 @@ module.exports = {
     '\\.(css|less)$': '<rootDir>/__mocks__/fileMock.js',
   },
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      }
+    }],
   },
   testPathIgnorePatterns: [
     '/node_modules/',
