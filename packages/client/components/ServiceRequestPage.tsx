@@ -9,6 +9,7 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import { ChatInput } from './ChatInput';
 import { mediaUploadService } from '../services/mediaUploadService';
 import { AuthModal } from './AuthModal';
+import { useToast } from '../contexts/ToastContext';
 
 export const ServiceRequestPage: React.FC = () => {
     const { category } = useParams<{ category: string }>();
@@ -24,6 +25,7 @@ export const ServiceRequestPage: React.FC = () => {
     const [statusMessage, setStatusMessage] = useState('');
     const [isBooking, setIsBooking] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
 
     // Checklist state
     const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
@@ -50,8 +52,16 @@ export const ServiceRequestPage: React.FC = () => {
         return basePrice + (checkedCount * itemValue);
     }, [analysis, checkedItems]);
 
+    const { showToast } = useToast();
+
     const handleInput = async (content: { type: 'text' | 'audio' | 'video', data: string | Blob }) => {
         if (!selectedCategory) return;
+
+        // Validation
+        if (content.type === 'text' && (content.data as string).trim().length < 10) {
+            showToast("Please provide more details (at least 10 characters).", "warning");
+            return;
+        }
 
         setIsLoading(true);
         setStatusMessage('Processing your request...');
@@ -87,7 +97,7 @@ export const ServiceRequestPage: React.FC = () => {
 
         } catch (error) {
             console.error('Analysis failed:', error);
-            alert('Failed to process request. Please try again.');
+            showToast('Failed to process request. Please try again.', 'error');
         } finally {
             setIsLoading(false);
             setStatusMessage('');
@@ -106,7 +116,7 @@ export const ServiceRequestPage: React.FC = () => {
 
         if (!location) {
             getLocation();
-            alert("We need your location to find nearby providers. Please allow location access.");
+            showToast("We need your location to find nearby providers. Please allow location access.", "warning");
             return;
         }
 
@@ -128,20 +138,21 @@ export const ServiceRequestPage: React.FC = () => {
                 address: {},
                 notes: `AI Analysis Reasoning: ${analysis.reasoning}`
             });
-            navigate(`/booking/${bookingId}`);
+            setCreatedBookingId(bookingId);
         } catch (error) {
             console.error('Booking creation failed:', error);
-            alert('Failed to create booking. Please try again.');
+            showToast('Failed to create booking. Please try again.', 'error');
             setIsBooking(false);
         }
     };
 
     if (isBooking) {
-        return <LiveSearch onCancel={() => setIsBooking(false)} />;
+        return <LiveSearch onCancel={() => setIsBooking(false)} bookingId={createdBookingId || undefined} />;
     }
 
     return (
-        <div className="min-h-screen pb-32">
+        <div className="min-h-screen pb-32" data-testid="service-request-page">
+            {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
             <div className="max-w-2xl mx-auto p-4 sm:p-8 animate-fade-in-up">
                 <div className="text-center mb-8">
                     <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
@@ -207,6 +218,7 @@ export const ServiceRequestPage: React.FC = () => {
                         <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t dark:border-slate-700 sticky bottom-0">
                             <button
                                 onClick={handleBook}
+                                data-testid="book-now-button"
                                 className="w-full py-4 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                             >
                                 Book Now • ₹{currentPrice}

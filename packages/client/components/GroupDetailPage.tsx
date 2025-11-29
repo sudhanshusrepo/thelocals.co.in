@@ -15,7 +15,7 @@ export const GroupDetailPage: React.FC = () => {
     }
 
     return (
-        <div className="animate-fade-in-up px-4">
+        <div className="animate-fade-in-up px-4" data-testid="group-detail-page">
             <div className="text-center py-4 sm:py-8">
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2 sm:mb-4">
                     {group.name}
@@ -29,6 +29,7 @@ export const GroupDetailPage: React.FC = () => {
                 {group.categories.map(category => (
                     <button
                         key={category}
+                        data-testid={`category-button-${category.toLowerCase()}`}
                         onClick={() => navigate(`/schedule?category=${category.toLowerCase()}`)}
                         className="flex flex-col items-center justify-center bg-white dark:bg-slate-800 p-4 rounded-xl hover:bg-teal-50 dark:hover:bg-teal-600/50 transition-all duration-300 h-28 sm:h-32 group shadow-md hover:shadow-lg hover:-translate-y-1 border border-slate-100 dark:border-slate-700"
                     >

@@ -35,6 +35,7 @@ export const HomePage: React.FC = () => {
                     {Object.values(SERVICE_GROUPS).map((group) => (
                         <button
                             key={group.name}
+                            data-testid="category-card"
                             onClick={() => navigate(`/group/${encodeURIComponent(group.name)}`)}
                             className={`
                                 relative flex flex-col items-center p-4 sm:p-6 

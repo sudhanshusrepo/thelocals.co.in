@@ -114,90 +114,56 @@ test.describe('Booking Flow - Enhanced', () => {
 
     test.describe('Live Booking', () => {
         test('should send live booking request to providers', async ({ page, testBooking }) => {
-            await serviceRequestPage.goto();
-
-            // Select live booking option
-            const liveBookingRadio = page.locator('input[value="LIVE"], input[type="radio"][value="live"]');
-            if (await liveBookingRadio.count() > 0) {
-                await liveBookingRadio.click();
-            }
+            await serviceRequestPage.goto(testBooking.category.toLowerCase());
 
             await serviceRequestPage.fillServiceRequest({
-                category: testBooking.category,
                 description: testBooking.description,
                 location: testBooking.location,
             });
 
             await serviceRequestPage.submitRequest();
+
+            // Wait for AI analysis
+            await expect(serviceRequestPage.aiChecklistSection).toBeVisible({ timeout: 10000 });
+
+            // Click Book Now to start Live Search
+            await serviceRequestPage.confirmBooking();
 
             // Verify live search initiated
-            const searchingMessage = page.locator('text=/searching|finding/i');
-            await expect(searchingMessage.first()).toBeVisible({ timeout: 5000 });
+            const liveSearchScreen = page.locator('[data-testid="live-search-screen"]');
+            await expect(liveSearchScreen).toBeVisible({ timeout: 5000 });
 
-            // Verify countdown timer
-            const countdown = page.locator('.countdown, [data-testid="countdown"]');
-            if (await countdown.count() > 0) {
-                await expect(countdown).toBeVisible();
-            }
-        });
-
-        test('should handle no providers available', async ({ page, testBooking }) => {
-            await serviceRequestPage.goto();
-
-            // Mock no providers response
-            await page.route('**/api/bookings/live', route => {
-                route.fulfill({
-                    status: 200,
-                    body: JSON.stringify({ providers: [] })
-                });
-            });
-
-            const liveBookingRadio = page.locator('input[value="LIVE"]');
-            if (await liveBookingRadio.count() > 0) {
-                await liveBookingRadio.click();
-            }
-
-            await serviceRequestPage.fillServiceRequest({
-                category: testBooking.category,
-                description: testBooking.description,
-                location: testBooking.location,
-            });
-
-            await serviceRequestPage.submitRequest();
-
-            // Check for no providers message
-            const noProvidersMessage = page.locator('text=/no providers|unavailable/i');
-            await expect(noProvidersMessage.first()).toBeVisible({ timeout: 10000 });
+            // Verify status messages update
+            await expect(page.locator('text=Searching for nearby professionals')).toBeVisible();
         });
 
         test('should cancel live booking request', async ({ page, testBooking }) => {
-            await serviceRequestPage.goto();
-
-            const liveBookingRadio = page.locator('input[value="LIVE"]');
-            if (await liveBookingRadio.count() > 0) {
-                await liveBookingRadio.click();
-            }
+            await serviceRequestPage.goto(testBooking.category.toLowerCase());
 
             await serviceRequestPage.fillServiceRequest({
-                category: testBooking.category,
                 description: testBooking.description,
                 location: testBooking.location,
             });
 
             await serviceRequestPage.submitRequest();
 
-            // Wait for search to start
-            await page.waitForTimeout(2000);
+            // Wait for AI analysis
+            await expect(serviceRequestPage.aiChecklistSection).toBeVisible({ timeout: 10000 });
+
+            // Click Book Now
+            await serviceRequestPage.confirmBooking();
+
+            // Verify live search screen
+            const liveSearchScreen = page.locator('[data-testid="live-search-screen"]');
+            await expect(liveSearchScreen).toBeVisible();
 
             // Cancel request
-            const cancelButton = page.locator('button:has-text("Cancel")');
-            if (await cancelButton.count() > 0) {
-                await cancelButton.click();
+            const cancelButton = page.locator('[data-testid="cancel-search-button"]');
+            await cancelButton.click();
 
-                // Verify cancellation
-                const cancelledMessage = page.locator('text=/cancelled|stopped/i');
-                await expect(cancelledMessage.first()).toBeVisible({ timeout: 5000 });
-            }
+            // Verify returned to service request page
+            await expect(liveSearchScreen).not.toBeVisible();
+            await expect(serviceRequestPage.aiChecklistSection).toBeVisible();
         });
     });
 

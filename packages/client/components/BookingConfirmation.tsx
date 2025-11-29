@@ -30,7 +30,9 @@ const BookingConfirmation: React.FC = () => {
             setBooking(updatedBooking);
         });
 
-        return () => unsubscribe();
+        return () => {
+            unsubscribe();
+        };
     }, [bookingId]);
 
     if (loading) {
@@ -47,40 +49,41 @@ const BookingConfirmation: React.FC = () => {
     }
 
     const getStatusInfo = () => {
-        switch (booking.status) {
+        const status = booking.status?.toUpperCase();
+        switch (status) {
             case 'PENDING':
-                return { text: 'Searching for available providers...', color: 'text-yellow-500' };
+                return { text: 'Searching for available providers...', color: 'text-yellow-500', icon: '🔍' };
             case 'CONFIRMED':
-                return { text: 'Provider confirmed! They are on their way.', color: 'text-green-500' };
+                return { text: 'Provider confirmed! They are on their way.', color: 'text-green-500', icon: '✅' };
             case 'IN_PROGRESS':
-                return { text: 'Job is in progress.', color: 'text-blue-500' };
+                return { text: 'Job is in progress.', color: 'text-blue-500', icon: '🔧' };
             case 'COMPLETED':
-                return { text: 'Job completed successfully!', color: 'text-gray-500' };
+                return { text: 'Job completed successfully!', color: 'text-gray-500', icon: '🎉' };
             case 'CANCELLED':
-                return { text: 'Booking has been cancelled.', color: 'text-red-500' };
+                return { text: 'Booking has been cancelled.', color: 'text-red-500', icon: '❌' };
             default:
-                return { text: 'Unknown status.', color: 'text-gray-500' };
+                return { text: 'Unknown status.', color: 'text-gray-500', icon: '❓' };
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto my-10 p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg animate-fade-in-up">
+        <div className="max-w-2xl mx-auto my-10 p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg animate-fade-in-up" data-testid="booking-confirmation">
             <div className="text-center mb-8">
-                <div className="text-5xl mb-4">🎉</div>
+                <div className="text-5xl mb-4">{getStatusInfo().icon}</div>
                 <h1 className="text-3xl font-bold dark:text-white">Booking Created Successfully!</h1>
                 <p className="text-slate-500 dark:text-slate-400 mt-2">
                     Your request has been received. We are now finding a provider for you.
                 </p>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-700 p-6 rounded-lg mb-6 text-sm">
+            <div className="bg-slate-50 dark:bg-slate-700 p-6 rounded-lg mb-6 text-sm" data-testid="booking-details">
                 <div className="flex justify-between items-center mb-4">
                     <span className="font-bold text-slate-600 dark:text-slate-300">Booking ID:</span>
-                    <span className="font-mono bg-slate-200 dark:bg-slate-600 px-2 py-1 rounded">{booking.id.substring(0, 8)}</span>
+                    <span className="font-mono bg-slate-200 dark:bg-slate-600 px-2 py-1 rounded" data-testid="booking-id">{booking.id.substring(0, 8)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="font-bold text-slate-600 dark:text-slate-300">Status:</span>
-                    <span className={`font-bold ${getStatusInfo().color}`}>{getStatusInfo().text}</span>
+                    <span className={`font-bold ${getStatusInfo().color}`} data-testid="booking-status">{getStatusInfo().text}</span>
                 </div>
             </div>
 

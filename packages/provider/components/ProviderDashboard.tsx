@@ -84,10 +84,10 @@ export const ProviderDashboard: React.FC = () => {
     }
   }
 
-  const pendingBookings = bookings.filter(b => b.status === 'PENDING');
-  const upcomingBookings = bookings.filter(b => b.status === 'CONFIRMED');
-  const activeBookings = bookings.filter(b => b.status === 'IN_PROGRESS');
-  const pastBookings = bookings.filter(b => b.status === 'COMPLETED' || b.status === 'CANCELLED');
+  const pendingBookings = bookings.filter(b => b.status?.toUpperCase() === 'PENDING');
+  const upcomingBookings = bookings.filter(b => b.status?.toUpperCase() === 'CONFIRMED');
+  const activeBookings = bookings.filter(b => b.status?.toUpperCase() === 'IN_PROGRESS');
+  const pastBookings = bookings.filter(b => b.status?.toUpperCase() === 'COMPLETED' || b.status?.toUpperCase() === 'CANCELLED');
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
@@ -211,42 +211,44 @@ const BookingList: React.FC<{ bookings: Booking[], onUpdateStatus?: (bookingId: 
 };
 
 const ProviderBookingCard: React.FC<{ booking: Booking, onUpdateStatus?: (bookingId: string, status: BookingStatus) => void }> = ({ booking, onUpdateStatus }) => {
+  const status = booking.status?.toUpperCase();
+  const paymentStatus = booking.payment_status?.toUpperCase();
 
   return (
-    <div className="bg-white rounded-2xl p-5 border shadow-sm flex flex-col justify-between">
+    <div className="bg-white rounded-2xl p-5 border shadow-sm flex flex-col justify-between" data-testid="provider-booking-card">
       <div>
         <div className="flex justify-between items-start mb-3">
           <div>
             <h3 className="font-bold text-gray-800">{booking.user?.name || 'New Client'}</h3>
-            <p className="text-xs text-gray-500">{new Date(booking.date).toLocaleString()}</p>
+            <p className="text-xs text-gray-500">{new Date(booking.created_at).toLocaleString()}</p>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800`}>
-            {booking.status.replace('_', ' ').toUpperCase()}
+            {status?.replace('_', ' ')}
           </div>
         </div>
         <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600 mb-4">
-          <p>"{booking.note}"</p>
+          <p>"{booking.notes}"</p>
         </div>
       </div>
       <div className="flex items-center justify-end gap-2 mt-2">
-        {booking.status === 'PENDING' && onUpdateStatus && (
+        {status === 'PENDING' && onUpdateStatus && (
           <button onClick={() => onUpdateStatus(booking.id, 'CONFIRMED')} className="text-sm font-bold text-white bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
             Accept
           </button>
         )}
-        {booking.status === 'CONFIRMED' && onUpdateStatus && (
+        {status === 'CONFIRMED' && onUpdateStatus && (
           <button onClick={() => onUpdateStatus(booking.id, 'IN_PROGRESS')} className="text-sm font-bold text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
             Start Job
           </button>
         )}
-        {booking.status === 'IN_PROGRESS' && onUpdateStatus && (
+        {status === 'IN_PROGRESS' && onUpdateStatus && (
           <button onClick={() => onUpdateStatus(booking.id, 'COMPLETED')} className="text-sm font-bold text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             Complete Job
           </button>
         )}
-        {booking.status === 'COMPLETED' && (
-          <div className={`text-sm font-bold p-2 rounded-lg ${booking.payment_status === 'paid' ? 'text-green-600 bg-green-50' : 'text-amber-600 bg-amber-50'}`}>
-            {booking.payment_status === 'paid' ? 'Payment Received' : 'Awaiting Payment'}
+        {status === 'COMPLETED' && (
+          <div className={`text-sm font-bold p-2 rounded-lg ${paymentStatus === 'PAID' ? 'text-green-600 bg-green-50' : 'text-amber-600 bg-amber-50'}`}>
+            {paymentStatus === 'PAID' ? 'Payment Received' : 'Awaiting Payment'}
           </div>
         )}
       </div>

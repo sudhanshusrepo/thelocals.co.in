@@ -63,7 +63,7 @@ export const SchedulePage: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6 animate-fade-in-up">
+        <div className="space-y-6 animate-fade-in-up" data-testid="schedule-page">
             <Helmet>
                 <title>{categoryName} Services - Schedule | Thelokals.com</title>
                 <meta
@@ -78,6 +78,7 @@ export const SchedulePage: React.FC = () => {
                     {serviceTypes.map((service) => (
                         <button
                             key={service.id}
+                            data-testid={`service-type-${service.id}`}
                             onClick={() => handleServiceSelect(service)}
                             className={`
                                 relative flex flex-col items-center p-4 sm:p-5 

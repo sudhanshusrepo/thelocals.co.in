@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet';
 import { BrowserRouter, Routes, Route, useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
@@ -14,12 +13,16 @@ import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import NotFound from './components/NotFound';
 import { LiveSearch } from './components/LiveSearch';
-import { GroupDetailPage } from './components/GroupDetailPage';
-import { ServiceRequestPage } from './components/ServiceRequestPage';
-import BookingConfirmation from './components/BookingConfirmation';
-import { HomePage } from './components/HomePage';
-import { SchedulePage } from './components/SchedulePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider } from './contexts/ToastContext';
+import { ToastContainer } from './components/ToastContainer';
+
+// Lazy load page components
+const GroupDetailPage = lazy(() => import('./components/GroupDetailPage').then(module => ({ default: module.GroupDetailPage })));
+const ServiceRequestPage = lazy(() => import('./components/ServiceRequestPage').then(module => ({ default: module.ServiceRequestPage })));
+const BookingConfirmation = lazy(() => import('./components/BookingConfirmation'));
+const HomePage = lazy(() => import('./components/HomePage').then(module => ({ default: module.HomePage })));
+const SchedulePage = lazy(() => import('./components/SchedulePage').then(module => ({ default: module.SchedulePage })));
 
 const AuthRequiredPlaceholder: React.FC<{ onSignIn: () => void, view: string }> = ({ onSignIn, view }) => (
     <div className="text-center py-20 animate-fade-in">
@@ -54,19 +57,15 @@ const DashboardPage: React.FC<{ isLoading: boolean }> = ({ isLoading }) => {
 const MainLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
 
-    const [isLoading, setIsLoading] = useState(true);
     const [isLocationLoading, setIsLocationLoading] = useState(false);
-
     const [userLocation, setUserLocation] = useState<Coordinates>(DEFAULT_CENTER);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
 
-    useEffect(() => {
-        // Simulate initial data loading
-        setTimeout(() => setIsLoading(false), 1000);
-    }, []);
+    // Use auth loading state
+    const isLoading = authLoading;
 
     const requestLocationAndProceed = useCallback((callback: (location: Coordinates) => void) => {
         setIsLocationLoading(true);
@@ -161,15 +160,17 @@ const MainLayout: React.FC = () => {
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     {isLoading ? <HomeSkeleton /> : (
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/schedule" element={<SchedulePage />} />
-                            <Route path="/group/:groupId" element={<GroupDetailPage />} />
-                            <Route path="/service/:category" element={<ServiceRequestPage />} />
-                            <Route path="/booking/:bookingId" element={<BookingConfirmation />} />
-                            <Route path="/dashboard/:view" element={<DashboardPage isLoading={isLoading} />} />
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
+                        <Suspense fallback={<HomeSkeleton />}>
+                            <Routes>
+                                <Route path="/" element={<HomePage />} />
+                                <Route path="/schedule" element={<SchedulePage />} />
+                                <Route path="/group/:groupId" element={<GroupDetailPage />} />
+                                <Route path="/service/:category" element={<ServiceRequestPage />} />
+                                <Route path="/booking/:bookingId" element={<BookingConfirmation />} />
+                                <Route path="/dashboard/:view" element={<DashboardPage isLoading={isLoading} />} />
+                                <Route path="*" element={<NotFound />} />
+                            </Routes>
+                        </Suspense>
                     )}
                 </main>
 
@@ -200,9 +201,12 @@ export default function App() {
     return (
         <ErrorBoundary>
             <AuthProvider>
-                <BrowserRouter>
-                    <MainLayout />
-                </BrowserRouter>
+                <ToastProvider>
+                    <BrowserRouter>
+                        <MainLayout />
+                        <ToastContainer />
+                    </BrowserRouter>
+                </ToastProvider>
             </AuthProvider>
         </ErrorBoundary>
     );
