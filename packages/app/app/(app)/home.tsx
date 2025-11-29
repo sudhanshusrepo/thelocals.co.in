@@ -1,7 +1,10 @@
-import { StyleSheet, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, SafeAreaView, ScrollView, TextInput, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { HowItWorks } from '@/components/HowItWorks';
+import { StickyChatCta } from '@/components/StickyChatCta';
 
 const categories = [
   { name: 'Plumbers' },
@@ -13,12 +16,39 @@ const categories = [
 ];
 
 export default function HomeScreen() {
+  const [isCtaVisible, setIsCtaVisible] = useState(false);
+  const lastScrollY = useRef(0);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+
+    // Show when scrolling up and not at the very top
+    if (currentScrollY < lastScrollY.current && currentScrollY > 50) {
+      setIsCtaVisible(true);
+    } else if (currentScrollY > lastScrollY.current || currentScrollY < 50) {
+      setIsCtaVisible(false);
+    }
+
+    lastScrollY.current = currentScrollY;
+  };
+
+  const handleChatSend = (text: string) => {
+    console.log("Chat sent:", text);
+    // TODO: Navigate to AI booking flow
+    alert("AI Booking flow coming soon!");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>The Lokals</Text>
       </View>
-      <ScrollView style={styles.container}>
+
+      <ScrollView
+        style={styles.scrollView}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         <View style={styles.searchContainer}>
           <View style={styles.searchWrapper}>
             <FontAwesome name="search" size={20} color={Colors.slate[400]} />
@@ -28,6 +58,8 @@ export default function HomeScreen() {
             />
           </View>
         </View>
+
+        <HowItWorks />
 
         <View style={styles.categoriesContainer}>
           <Text style={styles.categoriesTitle}>Categories</Text>
@@ -39,7 +71,15 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
         </View>
+
+        {/* Spacer for bottom content */}
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      <StickyChatCta
+        isVisible={isCtaVisible}
+        onSend={handleChatSend}
+      />
     </SafeAreaView>
   );
 }
@@ -47,11 +87,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: Colors.slate[200],
+    backgroundColor: '#fff',
   },
   headerTitle: {
     fontSize: 24,
@@ -63,13 +108,14 @@ const styles = StyleSheet.create({
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 8,
+    backgroundColor: Colors.slate[100],
+    borderRadius: 12,
+    padding: 12,
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
+    fontSize: 16,
   },
   categoriesContainer: {
     padding: 16,
@@ -77,14 +123,17 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   categoryCard: {
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
-    marginRight: 8,
+    marginRight: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.slate[200],
+    minWidth: 100,
   },
 });

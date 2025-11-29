@@ -73,10 +73,15 @@ export const ServiceRequestPage: React.FC = () => {
                 textToAnalyze = content.data as string;
             } else {
                 setStatusMessage('Uploading media...');
-                const uploadResult = await mediaUploadService.uploadMedia(content.data as Blob, content.type);
-
-                setStatusMessage('Transcribing...');
-                textToAnalyze = await mediaUploadService.transcribeMedia(uploadResult.url, content.type);
+                try {
+                    const uploadResult = await mediaUploadService.uploadMedia(content.data as Blob, content.type);
+                    setStatusMessage('Transcribing...');
+                    textToAnalyze = await mediaUploadService.transcribeMedia(uploadResult.url, content.type);
+                } catch (uploadError) {
+                    console.error('Media upload failed:', uploadError);
+                    showToast('Failed to upload media. Please try text input instead.', 'error');
+                    return;
+                }
             }
 
             setUserInput(textToAnalyze);
@@ -85,19 +90,43 @@ export const ServiceRequestPage: React.FC = () => {
             // Start fetching location
             getLocation();
 
-            const result = await estimateService(textToAnalyze, selectedCategory);
-            setAnalysis(result);
+            // Add timeout for AI analysis (10 seconds)
+            const analysisPromise = estimateService(textToAnalyze, selectedCategory);
+            const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('AI analysis timeout')), 10000)
+            );
 
-            // Initialize all items as checked
-            const initialChecked: Record<number, boolean> = {};
-            result.checklist.forEach((_, idx) => {
-                initialChecked[idx] = true;
-            });
-            setCheckedItems(initialChecked);
+            try {
+                const result = await Promise.race([analysisPromise, timeoutPromise]);
+                setAnalysis(result);
 
-        } catch (error) {
+                // Initialize all items as checked
+                const initialChecked: Record<number, boolean> = {};
+                result.checklist.forEach((_, idx) => {
+                    initialChecked[idx] = true;
+                });
+                setCheckedItems(initialChecked);
+                showToast('Analysis complete! Review the recommendations below.', 'success');
+            } catch (timeoutError) {
+                console.error('AI analysis timeout:', timeoutError);
+                showToast('AI analysis is taking longer than expected. Please try again or simplify your request.', 'warning');
+                // Optionally provide fallback or manual entry option
+                return;
+            }
+
+        } catch (error: any) {
             console.error('Analysis failed:', error);
-            showToast('Failed to process request. Please try again.', 'error');
+
+            // Provide specific error messages based on error type
+            if (error.message?.includes('network') || error.message?.includes('fetch')) {
+                showToast('Network error. Please check your connection and try again.', 'error');
+            } else if (error.message?.includes('timeout')) {
+                showToast('Request timed out. Please try again.', 'error');
+            } else if (error.message?.includes('API key')) {
+                showToast('Service configuration error. Please contact support.', 'error');
+            } else {
+                showToast('Failed to process request. Please try again or contact support.', 'error');
+            }
         } finally {
             setIsLoading(false);
             setStatusMessage('');
@@ -111,12 +140,20 @@ export const ServiceRequestPage: React.FC = () => {
         }
 
         if (!analysis || !selectedCategory) {
+            showToast('Please complete the AI analysis first.', 'warning');
             return;
         }
 
         if (!location) {
             getLocation();
             showToast("We need your location to find nearby providers. Please allow location access.", "warning");
+            return;
+        }
+
+        // Check if at least one item is selected
+        const hasSelectedItems = Object.values(checkedItems).some(Boolean);
+        if (!hasSelectedItems) {
+            showToast('Please select at least one service from the checklist.', 'warning');
             return;
         }
 
@@ -139,9 +176,21 @@ export const ServiceRequestPage: React.FC = () => {
                 notes: `AI Analysis Reasoning: ${analysis.reasoning}`
             });
             setCreatedBookingId(bookingId);
-        } catch (error) {
+            showToast('Booking created! Searching for providers...', 'success');
+        } catch (error: any) {
             console.error('Booking creation failed:', error);
-            showToast('Failed to create booking. Please try again.', 'error');
+
+            // Provide specific error messages
+            if (error.message?.includes('network') || error.message?.includes('fetch')) {
+                showToast('Network error. Please check your connection and try again.', 'error');
+            } else if (error.message?.includes('auth') || error.message?.includes('unauthorized')) {
+                showToast('Authentication error. Please sign in again.', 'error');
+                setShowAuthModal(true);
+            } else if (error.message?.includes('validation')) {
+                showToast('Invalid booking data. Please review your selections.', 'error');
+            } else {
+                showToast('Failed to create booking. Please try again or contact support.', 'error');
+            }
             setIsBooking(false);
         }
     };
@@ -165,7 +214,10 @@ export const ServiceRequestPage: React.FC = () => {
 
                 {/* Analysis Results */}
                 {analysis ? (
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700">
+                    <div
+                        data-testid="ai-checklist-section"
+                        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700"
+                    >
                         <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
@@ -182,10 +234,25 @@ export const ServiceRequestPage: React.FC = () => {
                         </div>
 
                         <div className="p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-sm">✓</span>
-                                Recommended Services
-                            </h3>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-sm">✓</span>
+                                    Recommended Services
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setAnalysis(null);
+                                        setCheckedItems({});
+                                    }}
+                                    data-testid="edit-requirements-button"
+                                    className="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Edit Requirements
+                                </button>
+                            </div>
                             <div className="space-y-3">
                                 {analysis.checklist.map((item, index) => (
                                     <label
