@@ -41,6 +41,33 @@ VITE_SUPABASE_ANON_KEY=your-preprod-anon-key
 VITE_API_URL=https://preprod-api.yourdomain.com
 ```
 
+## Test Structure
+
+```
+tests/
+├── e2e/
+│   ├── functional/
+│   │   ├── auth.spec.ts           # Authentication (login/register)
+│   │   ├── booking.spec.ts        # AI bookings, live requests, OTP
+│   │   ├── profile.spec.ts        # Client & provider profiles
+│   │   ├── provider-search.spec.ts # Location-based provider search
+│   │   └── reviews.spec.ts        # Review submission & ratings
+│   └── performance/
+│       └── load.spec.ts           # Performance benchmarks
+└── example.spec.ts
+```
+
+## Database Schema
+
+Tests are designed for the current schema:
+- **`service_categories`** - Service types grouped by category
+- **`providers`** - Service providers with location data
+- **`profiles`** - User profiles
+- **`bookings`** - AI-enhanced, live, and scheduled bookings
+- **`live_booking_requests`** - Real-time provider matching
+- **`booking_otp`** - OTP verification
+- **`reviews`** - Provider ratings and reviews
+
 ## Running Tests
 
 ### Run ST Environment Tests
@@ -63,6 +90,11 @@ npx playwright test --project=preprod
 npx playwright test --project=performance
 ```
 
+### Run Specific Test File
+```bash
+npx playwright test tests/e2e/functional/booking.spec.ts
+```
+
 ### Run All Tests
 ```bash
 npx playwright test
@@ -81,22 +113,9 @@ To view the HTML report:
 npx playwright show-report
 ```
 
-## Test Structure
-
-```
-tests/
-├── e2e/
-│   ├── functional/
-│   │   ├── auth.spec.ts
-│   │   ├── booking.spec.ts
-│   │   └── profile.spec.ts
-│   └── performance/
-│       └── load.spec.ts
-└── example.spec.ts
-```
-
 ## Notes
 
 - All test reports and environment files are gitignored
 - Update your local `.env.*` files with actual environment URLs
 - The test suite is designed to run locally before pushing to production
+- Tests use the new schema with providers (not workers) and advanced booking features

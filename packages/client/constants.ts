@@ -30,7 +30,7 @@ export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
   [WorkerCategory.MECHANIC]: "🚗",
   [WorkerCategory.CAR_WASHING]: '🧼',
   [WorkerCategory.DRIVER]: "🚖",
-  [WorkerCategory.BIKE_wahin]: '🚲',
+  [WorkerCategory.BIKE_REPAIR]: '🚲',
   [WorkerCategory.ROADSIDE_ASSISTANCE]: '🆘',
 
   // Original Personal & Family
@@ -53,7 +53,7 @@ export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
   [WorkerCategory.VIDEOGRAPHY]: '🎥',
   [WorkerCategory.SECURITY]: '🛡️',
   [WorkerCategory.CATERING]: '🍲',
-  
+
   [WorkerCategory.OTHER]: "🔍",
 };
 
@@ -73,7 +73,7 @@ export const CATEGORY_DISPLAY_NAMES: Record<WorkerCategory, string> = {
   [WorkerCategory.MECHANIC]: 'Mechanic',
   [WorkerCategory.CAR_WASHING]: 'Car Washing',
   [WorkerCategory.DRIVER]: 'Driver',
-  [WorkerCategory.BIKE_wahin]: 'Bike Repair',
+  [WorkerCategory.BIKE_REPAIR]: 'Bike Repair',
   [WorkerCategory.ROADSIDE_ASSISTANCE]: 'Roadside Assistance',
   [WorkerCategory.TUTOR]: 'Tutor',
   [WorkerCategory.FITNESS_TRAINER]: 'Fitness Trainer',
@@ -94,15 +94,15 @@ export const CATEGORY_DISPLAY_NAMES: Record<WorkerCategory, string> = {
 };
 
 export const LOWERCASE_TO_WORKER_CATEGORY = Object.fromEntries(
-    Object.values(WorkerCategory).map(v => [v.toLowerCase(), v])
+  Object.values(WorkerCategory).map(v => [v.toLowerCase(), v])
 ) as Record<string, WorkerCategory>;
 
 type ServiceGroup = {
-    name: string;
-    color: string;
-    icon: string;
-    categories: WorkerCategory[];
-    helperText: string;
+  name: string;
+  color: string;
+  icon: string;
+  categories: WorkerCategory[];
+  helperText: string;
 }
 
 // Reorganized service groups to logically contain all categories
@@ -113,28 +113,28 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     color: "blue",
     helperText: "Fix, maintain, and improve your home with trusted professionals.",
     categories: [
-      WorkerCategory.PLUMBER, 
-      WorkerCategory.ELECTRICIAN, 
-      WorkerCategory.CARPENTER, 
-      WorkerCategory.PAINTER, 
-      WorkerCategory.APPLIANCE_REPAIR, 
-      WorkerCategory.LOCKSMITH, 
+      WorkerCategory.PLUMBER,
+      WorkerCategory.ELECTRICIAN,
+      WorkerCategory.CARPENTER,
+      WorkerCategory.PAINTER,
+      WorkerCategory.APPLIANCE_REPAIR,
+      WorkerCategory.LOCKSMITH,
       WorkerCategory.PEST_CONTROL,
       WorkerCategory.GARDENER,
     ]
   },
   "Cleaning & Logistics": {
-      name: "Cleaning & Logistics",
-      icon: "📦",
-      color: "orange",
-      helperText: "Keep your space spotless and manage moves with ease.",
-      categories: [
-        WorkerCategory.MAID,
-        WorkerCategory.HOUSE_CLEANING,
-        WorkerCategory.LAUNDRY_SERVICE,
-        WorkerCategory.PACKERS_AND_MOVERS, 
-        WorkerCategory.CAR_WASHING,
-      ]
+    name: "Cleaning & Logistics",
+    icon: "📦",
+    color: "orange",
+    helperText: "Keep your space spotless and manage moves with ease.",
+    categories: [
+      WorkerCategory.MAID,
+      WorkerCategory.HOUSE_CLEANING,
+      WorkerCategory.LAUNDRY_SERVICE,
+      WorkerCategory.PACKERS_AND_MOVERS,
+      WorkerCategory.CAR_WASHING,
+    ]
   },
   "Auto & Transportation": {
     name: "Auto & Transportation",
@@ -142,9 +142,9 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     color: "green",
     helperText: "Keep your vehicles running smoothly and get where you need to go.",
     categories: [
-      WorkerCategory.MECHANIC, 
-      WorkerCategory.DRIVER, 
-      WorkerCategory.BIKE_wahin, 
+      WorkerCategory.MECHANIC,
+      WorkerCategory.DRIVER,
+      WorkerCategory.BIKE_REPAIR,
       WorkerCategory.ROADSIDE_ASSISTANCE,
     ]
   },
@@ -154,25 +154,25 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
     color: "purple",
     helperText: "Care for your loved ones and yourself with our dedicated experts.",
     categories: [
-      WorkerCategory.TUTOR, 
-      WorkerCategory.FITNESS_TRAINER, 
-      WorkerCategory.DOCTOR_NURSE, 
-      WorkerCategory.BEAUTICIAN, 
-      WorkerCategory.BABYSITTER, 
+      WorkerCategory.TUTOR,
+      WorkerCategory.FITNESS_TRAINER,
+      WorkerCategory.DOCTOR_NURSE,
+      WorkerCategory.BEAUTICIAN,
+      WorkerCategory.BABYSITTER,
       WorkerCategory.PET_SITTER,
     ]
   },
   "Food & Errands": {
-      name: "Food & Errands",
-      icon: "🍱",
-      color: "red",
-      helperText: "Delicious meals and convenient help for your daily tasks.",
-      categories: [
-        WorkerCategory.COOK, 
-        WorkerCategory.TIFFIN_SERVICE,
-        WorkerCategory.CATERING,
-        WorkerCategory.ERRAND_RUNNER,
-      ]
+    name: "Food & Errands",
+    icon: "🍱",
+    color: "red",
+    helperText: "Delicious meals and convenient help for your daily tasks.",
+    categories: [
+      WorkerCategory.COOK,
+      WorkerCategory.TIFFIN_SERVICE,
+      WorkerCategory.CATERING,
+      WorkerCategory.ERRAND_RUNNER,
+    ]
   },
   "Professional & Creative": {
     name: "Professional & Creative",

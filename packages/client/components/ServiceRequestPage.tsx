@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { aiService, AIAnalysisResult } from '@core/services/aiService';
+import { estimateService, AIAnalysisResult } from '@core/services/geminiService';
 import { bookingService } from '@core/services/bookingService';
 import { LiveSearch } from './LiveSearch';
 import { CATEGORY_DISPLAY_NAMES, LOWERCASE_TO_WORKER_CATEGORY } from '../constants';
+
 
 export const ServiceRequestPage: React.FC = () => {
     const { category } = useParams<{ category: string }>();
@@ -22,7 +23,7 @@ export const ServiceRequestPage: React.FC = () => {
         if (!selectedCategory) return;
         setIsLoading(true);
         try {
-            const result = await aiService.estimateService(userInput, selectedCategory);
+            const result = await estimateService(userInput, selectedCategory);
             setAnalysis(result);
         } catch (error) {
             console.error('AI analysis failed:', error);

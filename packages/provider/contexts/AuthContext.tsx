@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../services/supabase';
+import { supabase } from '@core/services/supabase';
 
 interface AuthContextType {
   session: Session | null;
@@ -16,9 +16,9 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
-  signOut: async () => {},
-  signInWithPhone: async () => {},
-  verifyOtp: async () => {},
+  signOut: async () => { },
+  signInWithPhone: async () => { },
+  verifyOtp: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        
+
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
@@ -64,9 +64,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const verifyOtp = async (phone: string, token: string) => {
     return supabase.auth.verifyOtp({
-        phone,
-        token,
-        type: 'sms'
+      phone,
+      token,
+      type: 'sms'
     });
   }
 
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut: async () => {
       try {
         await supabase.auth.signOut();
-      } catch (error) { 
+      } catch (error) {
         console.error("Error signing out:", error);
       }
     },

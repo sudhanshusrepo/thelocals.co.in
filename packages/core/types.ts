@@ -42,6 +42,14 @@ export type Coordinates = {
 
 export type WorkerStatus = 'AVAILABLE' | 'BUSY' | 'OFFLINE';
 
+export interface SearchIntent {
+  category: WorkerCategory | null;
+  keywords: string[];
+  sortBy: 'price' | 'rating' | 'distance' | 'relevance';
+  urgency: 'high' | 'normal';
+}
+
+
 export interface WorkerProfile {
   id: string;
   name: string;
