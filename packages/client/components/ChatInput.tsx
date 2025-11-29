@@ -6,9 +6,10 @@ interface ChatInputProps {
     onSend: (content: { type: 'text' | 'audio' | 'video', data: string | Blob }) => void;
     isLoading?: boolean;
     placeholder?: string;
+    className?: string;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading = false, placeholder = "Type or record your request..." }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading = false, placeholder = "Type or record your request...", className = "" }) => {
     const [text, setText] = useState('');
     const [mode, setMode] = useState<'text' | 'audio' | 'video'>('text');
 
@@ -53,7 +54,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading = false,
     // Audio Recording UI
     if (mode === 'audio') {
         return (
-            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 p-4 border-t dark:border-slate-700 shadow-lg z-50 animate-slide-up">
+            <div className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 p-4 border-t dark:border-slate-700 shadow-lg z-50 animate-slide-up ${className}`}>
                 <div className="max-w-3xl mx-auto flex flex-col items-center gap-4">
                     <div className="text-red-500 font-mono text-xl animate-pulse">
                         {formatTime(audioRecorder.recordingTime)} / 01:00
@@ -174,7 +175,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading = false,
 
     // Default Text Input UI
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t dark:border-slate-700 p-3 sm:p-4 pb-safe z-40">
+        <div className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t dark:border-slate-700 p-3 sm:p-4 pb-safe z-40 ${className}`}>
             <div className="max-w-3xl mx-auto flex items-end gap-2 sm:gap-3">
                 {/* Media Buttons */}
                 <div className="flex gap-1 sm:gap-2 pb-1">

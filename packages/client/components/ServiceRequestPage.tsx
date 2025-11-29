@@ -6,7 +6,7 @@ import { bookingService } from '@core/services/bookingService';
 import { LiveSearch } from './LiveSearch';
 import { CATEGORY_DISPLAY_NAMES, LOWERCASE_TO_WORKER_CATEGORY, SERVICE_TYPES_BY_CATEGORY } from '../constants';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { ChatInput } from './ChatInput';
+import { StickyChatCta } from './StickyChatCta';
 import { mediaUploadService } from '../services/mediaUploadService';
 import { AuthModal } from './AuthModal';
 import { useToast } from '../contexts/ToastContext';
@@ -244,10 +244,11 @@ export const ServiceRequestPage: React.FC = () => {
             </div>
 
             {/* Footer Chat Input - Only show if not yet analyzed */}
+            {/* Footer Chat Input - Only show if not yet analyzed */}
             {!analysis && (
-                <ChatInput
+                <StickyChatCta
+                    serviceCategory={selectedCategory}
                     onSend={handleInput}
-                    isLoading={isLoading}
                     placeholder={`Tell us about your ${serviceType?.name.toLowerCase() || 'issue'}...`}
                 />
             )}

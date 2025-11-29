@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { SERVICE_GROUPS } from '../constants';
 import { HowItWorks } from './HowItWorks';
 import { Features } from './Features';
+import { StickyChatCta } from './StickyChatCta';
 
 const OfferBanner: React.FC = () => (
     <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 sm:p-4 mb-4 rounded-md shadow-md">
@@ -73,6 +74,7 @@ export const HomePage: React.FC = () => {
                 </div>
                 <Features />
             </div>
+            <StickyChatCta />
         </div>
     );
 };

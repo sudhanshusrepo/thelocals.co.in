@@ -52,9 +52,9 @@ export const HowItWorks: React.FC = () => {
             </div>
 
             {/* Horizontal Flow Container */}
-            <div className="relative px-6">
+            <div className="relative px-4 sm:px-6">
                 {/* Animated Connector Line */}
-                <div className="absolute top-8 left-0 right-0 h-1 hidden md:block">
+                <div className="absolute top-6 sm:top-8 left-4 right-4 h-1 block">
                     <div className="absolute inset-0 bg-slate-200 dark:bg-slate-700 rounded-full" />
                     <div
                         className="absolute left-0 top-0 h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full transition-all duration-300 ease-out"
@@ -63,11 +63,11 @@ export const HowItWorks: React.FC = () => {
                 </div>
 
                 {/* Steps Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div className="flex md:grid md:grid-cols-3 gap-4 sm:gap-8 relative overflow-x-auto snap-x snap-mandatory pb-4 md:pb-0 hide-scrollbar">
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className="flex flex-col items-center text-center group relative z-10"
+                            className="flex-shrink-0 w-[80%] md:w-auto flex flex-col items-center text-center group relative z-10 snap-center mx-auto"
                             style={{
                                 opacity: scrollProgress > (index / steps.length) ? 1 : 0.5,
                                 transform: `translateY(${scrollProgress > (index / steps.length) ? '0' : '20px'})`,
@@ -76,8 +76,8 @@ export const HowItWorks: React.FC = () => {
                         >
                             {/* Icon Circle with Pulse Animation */}
                             <div className={`
-                                w-16 h-16 bg-white dark:bg-slate-800 rounded-full 
-                                flex items-center justify-center text-3xl mb-4 
+                                w-12 h-12 sm:w-16 sm:h-16 bg-white dark:bg-slate-800 rounded-full 
+                                flex items-center justify-center text-xl sm:text-3xl mb-3 sm:mb-4 
                                 shadow-lg border-4 
                                 ${scrollProgress > (index / steps.length)
                                     ? 'border-teal-500 scale-110'
@@ -96,9 +96,9 @@ export const HowItWorks: React.FC = () => {
                             {/* Step Number Badge */}
                             <div className={`
                                 absolute -top-2 left-1/2 -translate-x-1/2 
-                                w-8 h-8 rounded-full 
+                                w-6 h-6 sm:w-8 sm:h-8 rounded-full 
                                 flex items-center justify-center 
-                                text-xs font-bold text-white
+                                text-[10px] sm:text-xs font-bold text-white
                                 ${scrollProgress > (index / steps.length)
                                     ? 'bg-gradient-to-br from-teal-500 to-emerald-500'
                                     : 'bg-slate-400 dark:bg-slate-600'
@@ -108,19 +108,12 @@ export const HowItWorks: React.FC = () => {
                                 {index + 1}
                             </div>
 
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2 mt-2">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1 sm:mb-2 mt-1 sm:mt-2">
                                 {step.title}
                             </h3>
-                            <p className="text-slate-600 dark:text-slate-400 text-sm">
+                            <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm px-2">
                                 {step.description}
                             </p>
-
-                            {/* Connector Arrow (Mobile) */}
-                            {index < steps.length - 1 && (
-                                <div className="md:hidden my-4 text-teal-500 text-2xl animate-bounce">
-                                    ↓
-                                </div>
-                            )}
                         </div>
                     ))}
                 </div>
