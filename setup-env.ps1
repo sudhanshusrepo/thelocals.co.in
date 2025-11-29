@@ -35,7 +35,10 @@ $content = Get-Content .env
 $content = $content -replace "your_supabase_project_url_here", $SUPABASE_URL
 $content = $content -replace "your_supabase_anon_key_here", $SUPABASE_ANON_KEY
 if ($GEMINI_API_KEY) {
-    $content = $content -replace "your_gemini_api_key_here", $GEMINI_API_KEY
+    # Remove the VITE_ placeholder line
+    $content = $content | Where-Object { $_ -notmatch "VITE_GEMINI_API_KEY" }
+    # Add GEMINI_API_KEY for Edge Functions
+    $content += "GEMINI_API_KEY=$GEMINI_API_KEY"
 }
 $content | Set-Content .env
 

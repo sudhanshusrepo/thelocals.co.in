@@ -23,11 +23,19 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### 2. Google Gemini AI Configuration
 
-For AI-powered cost estimation:
+The Gemini API key is now managed securely via Supabase Edge Functions. You do NOT need to set `VITE_GEMINI_API_KEY` in your client environment.
 
+Instead, you need to set it as a secret in your Supabase project:
+
+**Local Development:**
 ```bash
-VITE_GEMINI_API_KEY=your_gemini_api_key
+echo "GEMINI_API_KEY=your_api_key" >> supabase/.env
 ```
+
+**Production (Supabase Dashboard):**
+1. Go to your Supabase Project
+2. Navigate to **Settings** → **Edge Functions**
+3. Add a new secret: `GEMINI_API_KEY` with your API key value
 
 **How to get this value:**
 

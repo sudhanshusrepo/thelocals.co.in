@@ -39,7 +39,10 @@ if [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sed -i.bak "s|your_supabase_project_url_here|$SUPABASE_URL|g" .env
     sed -i.bak "s|your_supabase_anon_key_here|$SUPABASE_ANON_KEY|g" .env
     if [ ! -z "$GEMINI_API_KEY" ]; then
-        sed -i.bak "s|your_gemini_api_key_here|$GEMINI_API_KEY|g" .env
+        # Add GEMINI_API_KEY for Edge Functions (Server-side)
+        echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+        # Remove the VITE_ placeholder if it exists
+        sed -i.bak "/VITE_GEMINI_API_KEY/d" .env
     fi
     rm .env.bak
 else
@@ -47,7 +50,10 @@ else
     sed -i "s|your_supabase_project_url_here|$SUPABASE_URL|g" .env
     sed -i "s|your_supabase_anon_key_here|$SUPABASE_ANON_KEY|g" .env
     if [ ! -z "$GEMINI_API_KEY" ]; then
-        sed -i "s|your_gemini_api_key_here|$GEMINI_API_KEY|g" .env
+        # Add GEMINI_API_KEY for Edge Functions (Server-side)
+        echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+        # Remove the VITE_ placeholder if it exists
+        sed -i "/VITE_GEMINI_API_KEY/d" .env
     fi
 fi
 
