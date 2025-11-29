@@ -1,19 +1,29 @@
 -- Migration: Realtime Setup
 -- Description: Enable realtime subscriptions for live booking flow
 -- Phase: 6 of 6
+-- Idempotent: Safe to re-run
+
+-- Drop existing view
+DROP VIEW IF EXISTS provider_dashboard_stats;
+
+-- Remove tables from realtime publication if they exist
+DO $$
+BEGIN
+  -- Remove tables from publication (ignore errors if not present)
+  ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS public.bookings;
+  ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS public.live_booking_requests;
+  ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS public.providers;
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END $$;
 
 -- Enable realtime for tables that need live updates
 ALTER PUBLICATION supabase_realtime ADD TABLE public.bookings;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.live_booking_requests;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.providers;
 
--- Note: Clients should subscribe to these channels:
--- 1. Providers: `live_booking_requests:provider_id=eq.{provider_id}` for incoming requests
--- 2. Clients: `bookings:client_id=eq.{client_id}` for booking status updates
--- 3. Providers: `bookings:provider_id=eq.{provider_id}` for assigned bookings
-
--- Create a view for provider dashboard stats (optional, for convenience)
-CREATE OR REPLACE VIEW provider_dashboard_stats AS
+-- Create a view for provider dashboard stats
+CREATE VIEW provider_dashboard_stats AS
 SELECT 
   p.id as provider_id,
   p.full_name,
@@ -35,3 +45,8 @@ GRANT SELECT ON provider_dashboard_stats TO authenticated;
 
 -- Enable RLS on the view
 ALTER VIEW provider_dashboard_stats SET (security_invoker = true);
+
+-- Note: Clients should subscribe to these channels:
+-- 1. Providers: live_booking_requests:provider_id=eq.{provider_id} for incoming requests
+-- 2. Clients: bookings:client_id=eq.{client_id} for booking status updates
+-- 3. Providers: bookings:provider_id=eq.{provider_id} for assigned bookings

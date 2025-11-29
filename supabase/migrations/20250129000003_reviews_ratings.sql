@@ -1,9 +1,20 @@
 -- Migration: Reviews and Ratings
 -- Description: Create reviews table and rating aggregation
 -- Phase: 3 of 6
+-- Idempotent: Safe to re-run
 
--- Drop old reviews table if it exists
+-- Drop existing tables and triggers
 DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TRIGGER IF EXISTS update_provider_rating_on_review_insert ON public.reviews;
+DROP TRIGGER IF EXISTS update_provider_rating_on_review_update ON public.reviews;
+DROP TRIGGER IF EXISTS update_provider_rating_on_review_delete ON public.reviews;
+DROP TRIGGER IF EXISTS update_provider_stats_on_booking_complete ON public.bookings;
+
+-- Drop existing indexes
+DROP INDEX IF EXISTS idx_reviews_provider;
+DROP INDEX IF EXISTS idx_reviews_client;
+DROP INDEX IF EXISTS idx_reviews_booking;
+DROP INDEX IF EXISTS idx_reviews_rating;
 
 -- Reviews Table
 CREATE TABLE public.reviews (
@@ -21,7 +32,7 @@ CREATE TABLE public.reviews (
 -- Enable RLS
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
--- Indexes
+-- Create indexes
 CREATE INDEX idx_reviews_provider ON public.reviews(provider_id, created_at DESC);
 CREATE INDEX idx_reviews_client ON public.reviews(client_id, created_at DESC);
 CREATE INDEX idx_reviews_booking ON public.reviews(booking_id);
@@ -53,7 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to update provider rating after review insert/update/delete
+-- Triggers to update provider rating after review changes
 CREATE TRIGGER update_provider_rating_on_review_insert
   AFTER INSERT ON public.reviews
   FOR EACH ROW EXECUTE FUNCTION update_provider_rating();

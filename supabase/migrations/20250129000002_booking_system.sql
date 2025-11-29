@@ -1,45 +1,62 @@
 -- Migration: Booking System
 -- Description: Create bookings, live booking requests, and OTP tables
 -- Phase: 2 of 6
+-- Idempotent: Safe to re-run
 
--- Booking Status Enum
-DO $$ BEGIN
-  CREATE TYPE booking_status AS ENUM (
-    'PENDING',
-    'CONFIRMED',
-    'IN_PROGRESS',
-    'COMPLETED',
-    'CANCELLED'
-  );
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
+-- Drop existing types if they exist
+DROP TYPE IF EXISTS booking_status CASCADE;
+DROP TYPE IF EXISTS booking_type CASCADE;
+DROP TYPE IF EXISTS payment_status CASCADE;
+DROP TYPE IF EXISTS request_status CASCADE;
 
--- Booking Type Enum
-DO $$ BEGIN
-  CREATE TYPE booking_type AS ENUM (
-    'AI_ENHANCED',
-    'LIVE',
-    'SCHEDULED'
-  );
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
-
--- Payment Status Enum
-DO $$ BEGIN
-  CREATE TYPE payment_status AS ENUM (
-    'PENDING',
-    'PAID',
-    'REFUNDED',
-    'FAILED'
-  );
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
-
--- Drop old bookings table if it exists (from previous schema)
+-- Drop existing tables
 DROP TABLE IF EXISTS public.bookings CASCADE;
+DROP TABLE IF EXISTS public.live_booking_requests CASCADE;
+DROP TABLE IF EXISTS public.booking_otp CASCADE;
+
+-- Drop existing indexes
+DROP INDEX IF EXISTS idx_bookings_client;
+DROP INDEX IF EXISTS idx_bookings_provider;
+DROP INDEX IF EXISTS idx_bookings_status;
+DROP INDEX IF EXISTS idx_bookings_date;
+DROP INDEX IF EXISTS idx_bookings_location;
+DROP INDEX IF EXISTS idx_live_requests_provider;
+DROP INDEX IF EXISTS idx_live_requests_booking;
+DROP INDEX IF EXISTS idx_live_requests_expires;
+DROP INDEX IF EXISTS idx_booking_otp_booking;
+DROP INDEX IF EXISTS idx_booking_otp_code;
+
+-- Drop existing triggers
+DROP TRIGGER IF EXISTS update_bookings_updated_at ON public.bookings;
+
+-- Create enums
+CREATE TYPE booking_status AS ENUM (
+  'PENDING',
+  'CONFIRMED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'CANCELLED'
+);
+
+CREATE TYPE booking_type AS ENUM (
+  'AI_ENHANCED',
+  'LIVE',
+  'SCHEDULED'
+);
+
+CREATE TYPE payment_status AS ENUM (
+  'PENDING',
+  'PAID',
+  'REFUNDED',
+  'FAILED'
+);
+
+CREATE TYPE request_status AS ENUM (
+  'PENDING',
+  'ACCEPTED',
+  'REJECTED',
+  'EXPIRED'
+);
 
 -- Bookings Table
 CREATE TABLE public.bookings (
@@ -73,22 +90,6 @@ CREATE TABLE public.bookings (
   updated_at timestamptz DEFAULT now()
 );
 
--- Live Booking Request Status Enum
-DO $$ BEGIN
-  CREATE TYPE request_status AS ENUM (
-    'PENDING',
-    'ACCEPTED',
-    'REJECTED',
-    'EXPIRED'
-  );
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
-
--- Drop old tables if they exist
-DROP TABLE IF EXISTS public.live_booking_requests CASCADE;
-DROP TABLE IF EXISTS public.booking_otp CASCADE;
-
 -- Live Booking Requests Table
 CREATE TABLE public.live_booking_requests (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -118,7 +119,7 @@ ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.live_booking_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.booking_otp ENABLE ROW LEVEL SECURITY;
 
--- Indexes for performance
+-- Create indexes
 CREATE INDEX idx_bookings_client ON public.bookings(client_id, created_at DESC);
 CREATE INDEX idx_bookings_provider ON public.bookings(provider_id, status, created_at DESC);
 CREATE INDEX idx_bookings_status ON public.bookings(status, created_at DESC);
@@ -133,10 +134,11 @@ CREATE INDEX idx_booking_otp_booking ON public.booking_otp(booking_id);
 CREATE INDEX idx_booking_otp_code ON public.booking_otp(otp_code) WHERE is_verified = false;
 
 -- Add updated_at trigger
-CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON public.bookings
+CREATE TRIGGER update_bookings_updated_at 
+  BEFORE UPDATE ON public.bookings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Auto-expire old live booking requests
+-- Auto-expire old live booking requests function
 CREATE OR REPLACE FUNCTION expire_old_live_requests()
 RETURNS void AS $$
 BEGIN
@@ -145,7 +147,3 @@ BEGIN
   WHERE status = 'PENDING' AND expires_at < now();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Create a scheduled job to run expiry (requires pg_cron extension)
--- Note: This will need to be set up separately in Supabase dashboard
--- SELECT cron.schedule('expire-live-requests', '*/1 * * * *', 'SELECT expire_old_live_requests()');

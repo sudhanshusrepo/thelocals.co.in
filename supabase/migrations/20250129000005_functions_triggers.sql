@@ -1,6 +1,16 @@
 -- Migration: Functions and Triggers
 -- Description: Database functions for provider matching, booking creation, and automation
 -- Phase: 5 of 6
+-- Idempotent: Safe to re-run
+
+-- Drop existing functions
+DROP FUNCTION IF EXISTS find_nearby_providers(geography, text, numeric, integer);
+DROP FUNCTION IF EXISTS create_ai_booking(uuid, text, jsonb, text[], numeric, geography, jsonb, text);
+DROP FUNCTION IF EXISTS broadcast_live_booking(uuid, uuid[], integer);
+DROP FUNCTION IF EXISTS accept_live_booking(uuid, uuid);
+DROP FUNCTION IF EXISTS generate_booking_otp(uuid);
+DROP FUNCTION IF EXISTS verify_booking_otp(uuid, text);
+DROP FUNCTION IF EXISTS complete_booking(uuid, numeric);
 
 -- ============================================
 -- PROVIDER MATCHING FUNCTION
