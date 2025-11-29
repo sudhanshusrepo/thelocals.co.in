@@ -17,7 +17,7 @@ export const ServiceRequestPage: React.FC = () => {
     const serviceTypeId = searchParams.get('serviceType');
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { location, getLocation } = useGeolocation();
+    const { location, getLocation, getLocationPromise } = useGeolocation();
 
     const [userInput, setUserInput] = useState('');
     const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
@@ -144,17 +144,24 @@ export const ServiceRequestPage: React.FC = () => {
             return;
         }
 
-        if (!location) {
-            getLocation();
-            showToast("We need your location to find nearby providers. Please allow location access.", "warning");
-            return;
-        }
-
         // Check if at least one item is selected
         const hasSelectedItems = Object.values(checkedItems).some(Boolean);
         if (!hasSelectedItems) {
             showToast('Please select at least one service from the checklist.', 'warning');
             return;
+        }
+
+        // Get location if not already available
+        let bookingLocation = location;
+        if (!bookingLocation) {
+            try {
+                showToast("Requesting location access to find nearby professionals...", "info");
+                bookingLocation = await getLocationPromise();
+            } catch (error) {
+                console.error("Location request failed:", error);
+                showToast("Location access is required to book a service. Please enable it in your browser settings.", "warning");
+                return;
+            }
         }
 
         setIsBooking(true);
@@ -171,7 +178,7 @@ export const ServiceRequestPage: React.FC = () => {
                 },
                 aiChecklist: finalChecklist,
                 estimatedCost: currentPrice,
-                location: location,
+                location: bookingLocation,
                 address: {},
                 notes: `AI Analysis Reasoning: ${analysis.reasoning}`
             });
