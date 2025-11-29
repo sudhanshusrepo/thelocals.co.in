@@ -67,7 +67,7 @@ export type UserProfile = {
 };
 
 export interface Booking {
-  id:string;
+  id: string;
   user_id: string;
   worker_id: string;
   date: string;
@@ -109,6 +109,14 @@ export interface Service {
     requiredFields: string[];
   };
   isActive: boolean;
+}
+
+export interface ServiceType {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: string; // e.g., "1 hr", "30 mins"
 }
 
 export interface User {

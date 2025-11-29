@@ -20,6 +20,9 @@ import NotFound from './components/NotFound';
 import LiveBooking from './components/LiveBooking';
 import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
+import { ServiceSelection } from './components/ServiceSelection';
+import { LiveSearch } from './components/LiveSearch';
+import { ServiceType } from '@core/types';
 
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
     if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
@@ -133,88 +136,29 @@ const HomePage: React.FC<{
     );
 };
 
-const ResultsPage: React.FC<{ allWorkers: WorkerProfile[], userLocation: Coordinates, isLoading: boolean, setSelectedWorker: (worker: WorkerProfile) => void }> = ({ allWorkers, userLocation, isLoading, setSelectedWorker }) => {
+const ServiceSelectionPage: React.FC<{
+    userLocation: Coordinates,
+    isLoading: boolean,
+    onBook: (service: ServiceType) => void
+}> = ({ userLocation, isLoading, onBook }) => {
     const { category } = useParams<{ category: string }>();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const searchQuery = searchParams.get('q') || '';
-    const [sortBy, setSortBy] = useState('relevance');
-
     const selectedCategory = category ? LOWERCASE_TO_WORKER_CATEGORY[category.toLowerCase()] : undefined;
-    const categoryDisplayName = selectedCategory ? CATEGORY_DISPLAY_NAMES[selectedCategory] : 'Services';
-
-    const filteredAndSortedWorkers = useMemo(() => {
-        const workersWithDistance = allWorkers.map(worker => ({
-            ...worker,
-            distanceKm: getDistanceFromLatLonInKm(userLocation.lat, userLocation.lng, worker.location.lat, worker.location.lng)
-        }));
-
-        const filtered = workersWithDistance.filter(worker => {
-            const categoryMatch = selectedCategory ? worker.category === selectedCategory : true;
-            if (!categoryMatch) return false;
-
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                const searchableText = [
-                    worker.name,
-                    worker.description,
-                    worker.category,
-                    ...worker.expertise
-                ].join(' ').toLowerCase();
-                return searchableText.includes(query);
-            }
-            return true;
-        });
-
-        filtered.sort((a, b) => {
-            if (sortBy === 'price') return a.price - b.price;
-            if (sortBy === 'rating') return b.rating - a.rating;
-            if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
-
-            const getScore = (w: typeof a) => {
-                let score = w.distanceKm * 0.5;
-                score -= w.rating * 2;
-                if (w.isVerified) score -= 5;
-                if (w.status === 'AVAILABLE') score -= 10;
-                return score;
-            };
-            return getScore(a) - getScore(b);
-        });
-
-        return filtered;
-    }, [allWorkers, userLocation, selectedCategory, searchQuery, sortBy]);
 
     if (isLoading) {
         return <SearchResultsSkeleton />;
     }
 
+    if (!selectedCategory) {
+        return <NotFound />;
+    }
+
     return (
         <div className="animate-fade-in">
             <Helmet>
-                <title>Thelokals.com | {categoryDisplayName}</title>
-                <meta name="description" content={`Find and book the best ${categoryDisplayName} in your area. Quick, reliable, and verified professionals.`} />
+                <title>Thelokals.com | Select Service</title>
+                <meta name="description" content="Select a specific service to book instantly." />
             </Helmet>
-            <ServiceStructuredData name={categoryDisplayName} description={`Find the best ${categoryDisplayName} in your area.`} url={window.location.href} />
-            <div className="flex overflow-x-auto pb-4 gap-3 no-scrollbar">
-                {['relevance', 'rating', 'distance', 'price'].map(sortType => (
-                    <button
-                        key={sortType}
-                        className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap border ${sortBy === sortType ? 'bg-slate-900 dark:bg-teal-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800'}`}
-                        onClick={() => setSortBy(sortType)}
-                    >
-                        {sortType.charAt(0).toUpperCase() + sortType.slice(1)}
-                    </button>
-                ))}
-            </div>
-            <p className="text-slate-500 text-sm my-4 font-medium">{filteredAndSortedWorkers.length} experts found</p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredAndSortedWorkers.map(worker => (
-                    <WorkerCard key={worker.id} worker={worker} distanceKm={worker.distanceKm} onConnect={setSelectedWorker} />
-                ))}
-            </div>
-            {filteredAndSortedWorkers.length === 0 && (
-                <NoData message="Try a different category or search term." />
-            )}
+            <ServiceSelection category={selectedCategory} onBook={onBook} />
         </div>
     );
 };
@@ -247,6 +191,7 @@ const MainLayout: React.FC = () => {
     const [selectedWorker, setSelectedWorker] = useState<WorkerProfile | null>(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showLiveBooking, setShowLiveBooking] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         const initialize = async () => {
@@ -285,8 +230,14 @@ const MainLayout: React.FC = () => {
     const handleSearch = (query: string, category: WorkerCategory | null) => {
         requestLocationAndProceed(() => {
             const path = category ? `/category/${category.toLowerCase()}` : '/search';
+            // Search logic would need to be adapted for service search
             navigate(`${path}?q=${query}`);
         });
+    };
+
+    const handleBookService = (service: ServiceType) => {
+        setIsSearching(true);
+        // Here we would call the backend to create a booking request
     };
 
     const handleCategorySelect = (category: WorkerCategory) => {
@@ -321,6 +272,10 @@ const MainLayout: React.FC = () => {
         return <LiveBooking />;
     }
 
+    if (isSearching) {
+        return <LiveSearch onCancel={() => setIsSearching(false)} />;
+    }
+
     return (
         <SkeletonTheme baseColor="#dcfce7" highlightColor="#bbf7d0">
             <div className="min-h-screen bg-[#f0fdf4] dark:bg-slate-900 font-sans pb-20">
@@ -343,8 +298,9 @@ const MainLayout: React.FC = () => {
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <Routes>
                         <Route path="/" element={<HomePage handleCategorySelect={handleCategorySelect} isLoading={isLoading} setShowLiveBooking={setShowLiveBooking} />} />
-                        <Route path="/category/:category" element={<ResultsPage allWorkers={allWorkers} userLocation={userLocation} isLoading={isResultsPageLoading} setSelectedWorker={setSelectedWorker} />} />
-                        <Route path="/search" element={<ResultsPage allWorkers={allWorkers} userLocation={userLocation} isLoading={isResultsPageLoading} setSelectedWorker={setSelectedWorker} />} />
+                        <Route path="/category/:category" element={<ServiceSelectionPage userLocation={userLocation} isLoading={isResultsPageLoading} onBook={handleBookService} />} />
+                        {/* Search page can remain as legacy or be updated later */}
+                        <Route path="/search" element={<ServiceSelectionPage userLocation={userLocation} isLoading={isResultsPageLoading} onBook={handleBookService} />} />
                         <Route path="/dashboard/:view" element={<DashboardPage isLoading={isLoading} />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>

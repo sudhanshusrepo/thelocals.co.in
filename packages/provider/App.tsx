@@ -11,6 +11,8 @@ import { backend } from './services/backend';
 import { ToastProvider, useToast } from './components/Toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Header } from './components/Header';
+import { IncomingRequestModal } from './components/IncomingRequestModal';
+import { ServiceType } from '@core/types';
 
 const initialData: ProviderProfile = {
   phoneNumber: '',
@@ -37,6 +39,29 @@ const MainApp = () => {
   const [isRestoring, setIsRestoring] = useState(true);
   const toast = useToast();
   const auth = useAuth();
+  const [incomingRequest, setIncomingRequest] = useState<{ service: ServiceType, distance: string, earnings: number } | null>(null);
+
+  // Simulate incoming request for demo purposes
+  useEffect(() => {
+    if (!started) return;
+
+    // Trigger a request after 10 seconds of being "online" (started)
+    const timer = setTimeout(() => {
+      setIncomingRequest({
+        service: {
+          id: 'demo-req',
+          name: 'Leak Repair',
+          description: 'Urgent: Kitchen sink pipe leaking heavily.',
+          price: 500,
+          duration: '1 hr'
+        },
+        distance: '2.5 km',
+        earnings: 450
+      });
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [started]);
 
   // Restore draft on load
   useEffect(() => {
@@ -114,6 +139,19 @@ const MainApp = () => {
           Step {step} of 5 • Secure 256-bit Connection
         </div>
       </div>
+
+      {incomingRequest && (
+        <IncomingRequestModal
+          service={incomingRequest.service}
+          distance={incomingRequest.distance}
+          earnings={incomingRequest.earnings}
+          onAccept={() => {
+            setIncomingRequest(null);
+            toast.show('Job Accepted! Navigating to details...', 'success');
+          }}
+          onReject={() => setIncomingRequest(null)}
+        />
+      )}
     </div>
   );
 }
