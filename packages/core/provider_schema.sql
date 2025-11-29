@@ -1,6 +1,9 @@
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
+-- Enable PostGIS extension for geography type
+create extension if not exists postgis;
+
 -- Providers Table (Extends auth.users)
 create table public.providers (
   id uuid references auth.users not null primary key,
