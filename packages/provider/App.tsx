@@ -39,7 +39,7 @@ const MainApp = () => {
   const [isRestoring, setIsRestoring] = useState(true);
   const toast = useToast();
   const auth = useAuth();
-  const [incomingRequest, setIncomingRequest] = useState<{ service: ServiceType, distance: string, earnings: number } | null>(null);
+  const [incomingRequest, setIncomingRequest] = useState<{ service: ServiceType, distance: string, earnings: number, checklist?: string[], estimatedCost?: number } | null>(null);
 
   // Simulate incoming request for demo purposes
   useEffect(() => {
@@ -56,13 +56,19 @@ const MainApp = () => {
           duration: '1 hr'
         },
         distance: '2.5 km',
-        earnings: 450
+        earnings: 450,
+        estimatedCost: 500,
+        checklist: [
+          'Inspect sink pipe',
+          'Replace worn washer',
+          'Seal connections',
+          'Test for leaks'
+        ]
       });
     }, 10000);
 
     return () => clearTimeout(timer);
   }, [started]);
-
   // Restore draft on load
   useEffect(() => {
     const loadDraft = async () => {
@@ -145,6 +151,8 @@ const MainApp = () => {
           service={incomingRequest.service}
           distance={incomingRequest.distance}
           earnings={incomingRequest.earnings}
+          checklist={incomingRequest.checklist}
+          estimatedCost={incomingRequest.estimatedCost}
           onAccept={() => {
             setIncomingRequest(null);
             toast.show('Job Accepted! Navigating to details...', 'success');

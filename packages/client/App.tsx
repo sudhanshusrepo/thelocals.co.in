@@ -22,6 +22,8 @@ import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
 import { ServiceSelection } from './components/ServiceSelection';
 import { LiveSearch } from './components/LiveSearch';
+import { GroupDetailPage } from './components/GroupDetailPage';
+import { ServiceRequestPage } from './components/ServiceRequestPage';
 import { ServiceType } from '@core/types';
 
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -235,14 +237,15 @@ const MainLayout: React.FC = () => {
         });
     };
 
-    const handleBookService = (service: ServiceType) => {
+    const handleBookService = (service: ServiceType, checklist?: string[], estimatedCost?: number) => {
         setIsSearching(true);
-        // Here we would call the backend to create a booking request
+        // Here we would call the backend to create a booking request with the checklist and cost
+        console.log("Booking request:", { service, checklist, estimatedCost });
     };
 
     const handleCategorySelect = (category: WorkerCategory) => {
         requestLocationAndProceed(() => {
-            navigate(`/category/${category.toLowerCase()}`);
+            navigate(`/service/${category.toLowerCase()}`);
         });
     };
 
@@ -297,8 +300,11 @@ const MainLayout: React.FC = () => {
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <Routes>
-                        <Route path="/" element={<HomePage handleCategorySelect={handleCategorySelect} isLoading={isLoading} setShowLiveBooking={setShowLiveBooking} />} />
-                        <Route path="/category/:category" element={<ServiceSelectionPage userLocation={userLocation} isLoading={isResultsPageLoading} onBook={handleBookService} />} />
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/group/:groupId" element={<GroupDetailPage />} />
+                        <Route path="/service/:category" element={<ServiceRequestPage onBook={handleBookService} />} />
+                        {/* Legacy routes kept for backward compatibility if needed */}
+                        <Route path="/category/:category" element={<ServiceSelectionPage userLocation={userLocation} isLoading={isResultsPageLoading} onBook={(s) => handleBookService(s)} />} />
                         {/* Search page can remain as legacy or be updated later */}
                         <Route path="/search" element={<ServiceSelectionPage userLocation={userLocation} isLoading={isResultsPageLoading} onBook={handleBookService} />} />
                         <Route path="/dashboard/:view" element={<DashboardPage isLoading={isLoading} />} />

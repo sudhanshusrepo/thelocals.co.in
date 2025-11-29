@@ -5,11 +5,13 @@ interface IncomingRequestModalProps {
     service: ServiceType;
     distance: string;
     earnings: number;
+    checklist?: string[];
+    estimatedCost?: number;
     onAccept: () => void;
     onReject: () => void;
 }
 
-export const IncomingRequestModal: React.FC<IncomingRequestModalProps> = ({ service, distance, earnings, onAccept, onReject }) => {
+export const IncomingRequestModal: React.FC<IncomingRequestModalProps> = ({ service, distance, earnings, checklist, estimatedCost, onAccept, onReject }) => {
     const [timeLeft, setTimeLeft] = useState(30);
 
     useEffect(() => {
@@ -40,9 +42,22 @@ export const IncomingRequestModal: React.FC<IncomingRequestModalProps> = ({ serv
                             <span>📍 {distance} away</span>
                         </div>
                         <div className="flex items-center gap-2 text-teal-600 font-bold text-lg">
-                            <span>💰 ₹{earnings}</span>
+                            <span>💰 ₹{estimatedCost || earnings}</span>
                         </div>
                     </div>
+
+                    {checklist && checklist.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-slate-200">
+                            <p className="text-xs font-bold text-slate-500 uppercase mb-2">Task Checklist</p>
+                            <ul className="space-y-1">
+                                {checklist.map((item, idx) => (
+                                    <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
+                                        <span className="text-teal-500 mt-1">✓</span> {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

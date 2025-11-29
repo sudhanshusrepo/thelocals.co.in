@@ -146,6 +146,8 @@ export interface LiveBooking {
     [key: string]: any;
   };
   otp: string;
+  checklist?: string[];
+  estimatedCost?: number;
   createdAt: any; // serverTimestamp
   acceptedAt: any | null;
   startedAt: any | null;
