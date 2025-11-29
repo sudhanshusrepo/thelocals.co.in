@@ -29,7 +29,7 @@ export const GroupDetailPage: React.FC = () => {
                 {group.categories.map(category => (
                     <button
                         key={category}
-                        onClick={() => navigate(`/service/${category.toLowerCase()}`)}
+                        onClick={() => navigate(`/schedule?category=${category.toLowerCase()}`)}
                         className="flex flex-col items-center justify-center bg-white dark:bg-slate-800 p-4 rounded-xl hover:bg-teal-50 dark:hover:bg-teal-600/50 transition-all duration-300 h-28 sm:h-32 group shadow-md hover:shadow-lg hover:-translate-y-1 border border-slate-100 dark:border-slate-700"
                     >
                         <span className="text-3xl sm:text-4xl mb-2 sm:mb-3 text-teal-600">{CATEGORY_ICONS[category as WorkerCategory]}</span>

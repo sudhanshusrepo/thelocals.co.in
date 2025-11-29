@@ -190,5 +190,94 @@ export const SERVICE_GROUPS: Record<string, ServiceGroup> = {
   }
 }
 
+// Service type definitions for each category
+export interface ServiceType {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  priceRange: string;
+  category: WorkerCategory;
+}
+
+// Service types mapped by category
+export const SERVICE_TYPES_BY_CATEGORY: Record<WorkerCategory, ServiceType[]> = {
+  [WorkerCategory.PLUMBER]: [
+    { id: 'leak-repair', name: 'Leak Repair', icon: '💧', description: 'Fix leaking pipes, taps, or tanks', priceRange: '₹500-1500', category: WorkerCategory.PLUMBER },
+    { id: 'installation', name: 'Installation', icon: '🔧', description: 'Install new taps, pipes, or fixtures', priceRange: '₹300-1000', category: WorkerCategory.PLUMBER },
+    { id: 'blockage', name: 'Blockage Clearing', icon: '🚿', description: 'Clear blocked drains or toilets', priceRange: '₹400-1200', category: WorkerCategory.PLUMBER },
+    { id: 'maintenance', name: 'Maintenance', icon: '🛠️', description: 'Regular plumbing checkup', priceRange: '₹300-800', category: WorkerCategory.PLUMBER },
+  ],
+  [WorkerCategory.ELECTRICIAN]: [
+    { id: 'wiring', name: 'Wiring', icon: '⚡', description: 'New wiring or rewiring', priceRange: '₹800-2500', category: WorkerCategory.ELECTRICIAN },
+    { id: 'fan-install', name: 'Fan Installation', icon: '🌀', description: 'Install ceiling or wall fans', priceRange: '₹400-900', category: WorkerCategory.ELECTRICIAN },
+    { id: 'switch-repair', name: 'Switch/Socket Repair', icon: '🔌', description: 'Fix or replace switches and sockets', priceRange: '₹200-600', category: WorkerCategory.ELECTRICIAN },
+    { id: 'appliance-install', name: 'Appliance Setup', icon: '💡', description: 'Install lights, geysers, etc.', priceRange: '₹300-1000', category: WorkerCategory.ELECTRICIAN },
+  ],
+  [WorkerCategory.CARPENTER]: [
+    { id: 'furniture-repair', name: 'Furniture Repair', icon: '🪑', description: 'Fix broken furniture', priceRange: '₹400-1500', category: WorkerCategory.CARPENTER },
+    { id: 'custom-furniture', name: 'Custom Furniture', icon: '🛋️', description: 'Build custom cabinets, tables', priceRange: '₹2000-10000', category: WorkerCategory.CARPENTER },
+    { id: 'door-window', name: 'Door/Window Work', icon: '🚪', description: 'Install or repair doors and windows', priceRange: '₹600-2000', category: WorkerCategory.CARPENTER },
+    { id: 'polish', name: 'Polishing', icon: '✨', description: 'Polish and refinish wood', priceRange: '₹500-2000', category: WorkerCategory.CARPENTER },
+  ],
+  [WorkerCategory.PAINTER]: [
+    { id: 'interior', name: 'Interior Painting', icon: '🏠', description: 'Paint walls, ceilings inside', priceRange: '₹15-30/sqft', category: WorkerCategory.PAINTER },
+    { id: 'exterior', name: 'Exterior Painting', icon: '🏡', description: 'Paint outside walls', priceRange: '₹20-40/sqft', category: WorkerCategory.PAINTER },
+    { id: 'texture', name: 'Texture Painting', icon: '🎨', description: 'Decorative texture work', priceRange: '₹25-50/sqft', category: WorkerCategory.PAINTER },
+    { id: 'touch-up', name: 'Touch-up', icon: '🖌️', description: 'Small repairs and touch-ups', priceRange: '₹300-1000', category: WorkerCategory.PAINTER },
+  ],
+  [WorkerCategory.MAID]: [
+    { id: 'daily', name: 'Daily Cleaning', icon: '🧹', description: 'Regular daily house cleaning', priceRange: '₹3000-8000/month', category: WorkerCategory.MAID },
+    { id: 'part-time', name: 'Part-time Help', icon: '⏰', description: 'Few hours per day', priceRange: '₹2000-5000/month', category: WorkerCategory.MAID },
+    { id: 'full-time', name: 'Full-time Help', icon: '🏠', description: '8-10 hours daily', priceRange: '₹8000-15000/month', category: WorkerCategory.MAID },
+    { id: 'cooking', name: 'Cooking + Cleaning', icon: '👩‍🍳', description: 'Meal prep and cleaning', priceRange: '₹5000-12000/month', category: WorkerCategory.MAID },
+  ],
+  [WorkerCategory.HOUSE_CLEANING]: [
+    { id: 'deep-clean', name: 'Deep Cleaning', icon: '✨', description: 'Thorough one-time cleaning', priceRange: '₹2000-8000', category: WorkerCategory.HOUSE_CLEANING },
+    { id: 'move-in-out', name: 'Move-in/out Cleaning', icon: '📦', description: 'Cleaning for moving', priceRange: '₹3000-10000', category: WorkerCategory.HOUSE_CLEANING },
+    { id: 'sofa-carpet', name: 'Sofa/Carpet Cleaning', icon: '🛋️', description: 'Professional upholstery cleaning', priceRange: '₹500-3000', category: WorkerCategory.HOUSE_CLEANING },
+    { id: 'kitchen-bathroom', name: 'Kitchen/Bathroom', icon: '🚿', description: 'Specialized cleaning', priceRange: '₹800-2500', category: WorkerCategory.HOUSE_CLEANING },
+  ],
+  [WorkerCategory.MECHANIC]: [
+    { id: 'general-service', name: 'General Service', icon: '🔧', description: 'Regular car servicing', priceRange: '₹1500-5000', category: WorkerCategory.MECHANIC },
+    { id: 'repair', name: 'Repair Work', icon: '🛠️', description: 'Fix specific issues', priceRange: '₹800-10000', category: WorkerCategory.MECHANIC },
+    { id: 'oil-change', name: 'Oil Change', icon: '🛢️', description: 'Engine oil replacement', priceRange: '₹500-2000', category: WorkerCategory.MECHANIC },
+    { id: 'inspection', name: 'Pre-purchase Inspection', icon: '🔍', description: 'Check used car condition', priceRange: '₹1000-3000', category: WorkerCategory.MECHANIC },
+  ],
+  [WorkerCategory.TUTOR]: [
+    { id: 'school', name: 'School Tuition', icon: '📚', description: 'K-12 subject tutoring', priceRange: '₹300-1000/hr', category: WorkerCategory.TUTOR },
+    { id: 'competitive', name: 'Competitive Exams', icon: '🎯', description: 'JEE, NEET, etc.', priceRange: '₹500-2000/hr', category: WorkerCategory.TUTOR },
+    { id: 'language', name: 'Language Classes', icon: '🗣️', description: 'English, Hindi, etc.', priceRange: '₹300-800/hr', category: WorkerCategory.TUTOR },
+    { id: 'music-art', name: 'Music/Art', icon: '🎵', description: 'Creative skills training', priceRange: '₹400-1500/hr', category: WorkerCategory.TUTOR },
+  ],
+  // Add default empty arrays for other categories
+  [WorkerCategory.APPLIANCE_REPAIR]: [],
+  [WorkerCategory.LOCKSMITH]: [],
+  [WorkerCategory.PEST_CONTROL]: [],
+  [WorkerCategory.GARDENER]: [],
+  [WorkerCategory.LAUNDRY_SERVICE]: [],
+  [WorkerCategory.PACKERS_AND_MOVERS]: [],
+  [WorkerCategory.CAR_WASHING]: [],
+  [WorkerCategory.DRIVER]: [],
+  [WorkerCategory.BIKE_REPAIR]: [],
+  [WorkerCategory.ROADSIDE_ASSISTANCE]: [],
+  [WorkerCategory.FITNESS_TRAINER]: [],
+  [WorkerCategory.DOCTOR_NURSE]: [],
+  [WorkerCategory.TIFFIN_SERVICE]: [],
+  [WorkerCategory.BEAUTICIAN]: [],
+  [WorkerCategory.BABYSITTER]: [],
+  [WorkerCategory.PET_SITTER]: [],
+  [WorkerCategory.COOK]: [],
+  [WorkerCategory.ERRAND_RUNNER]: [],
+  [WorkerCategory.DOCUMENTATION_ASSISTANCE]: [],
+  [WorkerCategory.TECH_SUPPORT]: [],
+  [WorkerCategory.PHOTOGRAPHY]: [],
+  [WorkerCategory.VIDEOGRAPHY]: [],
+  [WorkerCategory.SECURITY]: [],
+  [WorkerCategory.CATERING]: [],
+  [WorkerCategory.OTHER]: [],
+};
+
 // Default start location (if geo fails)
 export const DEFAULT_CENTER = { lat: 37.7749, lng: -122.4194 };
+

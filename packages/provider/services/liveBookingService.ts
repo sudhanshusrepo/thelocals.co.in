@@ -1,7 +1,7 @@
 
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { supabase } from './supabase';
-import { BookingRequest } from '../../core/types';
+import { supabase } from '@core/services/supabase';
+import { BookingRequest } from '@core/types';
 
 export const liveBookingService = {
   /**

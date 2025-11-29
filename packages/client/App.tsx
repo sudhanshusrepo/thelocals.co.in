@@ -18,6 +18,7 @@ import { GroupDetailPage } from './components/GroupDetailPage';
 import { ServiceRequestPage } from './components/ServiceRequestPage';
 import BookingConfirmation from './components/BookingConfirmation';
 import { HomePage } from './components/HomePage';
+import { SchedulePage } from './components/SchedulePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 const AuthRequiredPlaceholder: React.FC<{ onSignIn: () => void, view: string }> = ({ onSignIn, view }) => (
@@ -162,6 +163,7 @@ const MainLayout: React.FC = () => {
                     {isLoading ? <HomeSkeleton /> : (
                         <Routes>
                             <Route path="/" element={<HomePage />} />
+                            <Route path="/schedule" element={<SchedulePage />} />
                             <Route path="/group/:groupId" element={<GroupDetailPage />} />
                             <Route path="/service/:category" element={<ServiceRequestPage />} />
                             <Route path="/booking/:bookingId" element={<BookingConfirmation />} />
