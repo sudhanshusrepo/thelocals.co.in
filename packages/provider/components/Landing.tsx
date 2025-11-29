@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from './Header';
+import { AuthModal } from './AuthModal';
 
 interface LandingProps {
   onStart: () => void;
 }
 
 export const Landing: React.FC<LandingProps> = ({ onStart }) => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+
+  const handleBecomePartner = () => {
+    setAuthMode('signup');
+    setShowAuthModal(true);
+  };
+
+  const handleSignIn = () => {
+    setAuthMode('login');
+    setShowAuthModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <Header title="" showAutoSaving={false} />
+      <Header title="" showAutoSaving={false} onSignInClick={handleSignIn} />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-slate-50 pt-16 pb-32">
@@ -21,7 +35,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart }) => {
             Join thousands of skilled professionals finding new customers and managing their business effortlessly.
           </p>
           <button
-            onClick={onStart}
+            onClick={handleBecomePartner}
             className="px-8 py-4 bg-teal-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-teal-700 hover:shadow-xl transition-all transform hover:-translate-y-1"
           >
             Become a Partner
@@ -68,6 +82,14 @@ export const Landing: React.FC<LandingProps> = ({ onStart }) => {
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          initialMode={authMode}
+        />
+      )}
     </div>
   );
 };
