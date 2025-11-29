@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { Landing } from './components/Landing';
 import { Stepper } from './components/Stepper';
 import { PhoneStep } from './components/steps/PhoneStep';
@@ -179,10 +180,12 @@ const MainApp = () => {
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <MainApp />
-      </AuthProvider>
-    </ToastProvider>
+    <BrowserRouter>
+      <ToastProvider>
+        <AuthProvider>
+          <MainApp />
+        </AuthProvider>
+      </ToastProvider>
+    </BrowserRouter>
   );
 }
