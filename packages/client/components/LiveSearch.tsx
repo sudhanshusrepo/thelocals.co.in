@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { bookingService } from '@core/services/bookingService';
 import { MapComponent } from './MapComponent';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { supabase } from '../../core/services/supabase';
 
 interface LiveSearchProps {
     onCancel: () => void;
@@ -16,45 +17,59 @@ export const LiveSearch: React.FC<LiveSearchProps> = ({ onCancel, bookingId }) =
     const { location } = useGeolocation();
 
     useEffect(() => {
-        // Simulate search progress (will be replaced by real logic later)
+        let mounted = true;
+
+        const performSearch = async () => {
+            if (!bookingId || !location) return;
+
+            try {
+                // 1. Fetch booking details to get category
+                const booking = await bookingService.getBooking(bookingId);
+                if (!booking || !mounted) return;
+
+                setStatus(`Searching for ${booking.service_category || 'professionals'}...`);
+
+                // 2. Find nearby providers
+                const { data: providers, error } = await supabase.rpc('find_nearby_providers', {
+                    lat: location.lat,
+                    long: location.lng,
+                    radius_km: 15,
+                    service_category: booking.service_category
+                });
+
+                if (error) throw error;
+
+                if (mounted) {
+                    if (providers && providers.length > 0) {
+                        setStatus(`Contacting ${providers.length} nearby professionals...`);
+                        setProgress(60);
+                        // In production: Trigger push notifications here
+                    } else {
+                        setStatus('No providers found nearby. Expanding search...');
+                        setProgress(40);
+                    }
+                }
+            } catch (err) {
+                console.error('Search error:', err);
+                if (mounted) setStatus('Error searching for providers.');
+            }
+        };
+
+        // Progress animation
         const progressInterval = setInterval(() => {
             setProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(progressInterval);
-                    return 100;
-                }
-                return prev + 2; // Slower progress
+                if (prev >= 90) return 90; // Hold at 90% until accepted
+                return prev + 1;
             });
-        }, 200);
+        }, 500);
 
-        // Update status messages
-        const statusTimer1 = setTimeout(() => {
-            setStatus('Scanning your neighborhood...');
-        }, 3000);
-
-        const statusTimer2 = setTimeout(() => {
-            setStatus('Contacting top-rated providers...');
-        }, 6000);
-
-        const statusTimer3 = setTimeout(() => {
-            setStatus('Waiting for provider acceptance...');
-        }, 9000);
-
-        // Navigate to booking confirmation after search completes (Simulation for now)
-        const navigationTimer = setTimeout(() => {
-            if (bookingId) {
-                navigate(`/booking/${bookingId}`);
-            }
-        }, 12000);
+        performSearch();
 
         return () => {
+            mounted = false;
             clearInterval(progressInterval);
-            clearTimeout(statusTimer1);
-            clearTimeout(statusTimer2);
-            clearTimeout(statusTimer3);
-            clearTimeout(navigationTimer);
         };
-    }, [bookingId, navigate]);
+    }, [bookingId, location]);
 
     // Subscribe to booking updates if bookingId is provided
     useEffect(() => {
