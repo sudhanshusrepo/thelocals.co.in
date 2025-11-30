@@ -223,7 +223,24 @@ export const bookingService = {
     }
 
     // Ensure booking is marked as completed if it wasn't already (though flow usually ensures this)
-    await this.updateBookingStatus(bookingId, 'completed');
+    await this.updateBookingStatus(bookingId, 'COMPLETED');
+  },
+
+  /**
+   * Process payment for a booking
+   * @param {string} bookingId - The ID of the booking to process payment for.
+   * @throws {Error} If the payment processing fails.
+   */
+  async processPayment(bookingId: string) {
+    const { error } = await supabase
+      .from('bookings')
+      .update({ payment_status: 'PAID' })
+      .eq('id', bookingId);
+
+    if (error) {
+      logger.error('Error processing payment', { error, bookingId });
+      throw error;
+    }
   },
 
   // NEW LIVE BOOKING SYSTEM FUNCTIONS
