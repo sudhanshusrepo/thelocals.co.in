@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       historyApiFallback: true,
     },
     build: {
-      outDir: '../../dist',
+      outDir: 'dist',
     },
     plugins: [react()],
     define: {
