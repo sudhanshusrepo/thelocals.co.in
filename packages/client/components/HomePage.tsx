@@ -6,25 +6,63 @@ import { HowItWorks } from './HowItWorks';
 import { Features } from './Features';
 import { StickyChatCta } from './StickyChatCta';
 
-const OfferBanner: React.FC = () => (
-    <div className="
-        relative overflow-hidden
-        bg-gradient-to-r from-emerald-500 to-teal-600 
-        text-white p-4 sm:p-6 mb-8 rounded-2xl shadow-lg shadow-emerald-500/20
-        transform hover:scale-[1.02] transition-transform duration-300
-    ">
-        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-black/10 rounded-full blur-xl"></div>
+import { useGeolocation } from '../hooks/useGeolocation';
+import { isLocationInBetaArea, BETA_OFFER_DETAILS } from '../utils/offerUtils';
 
-        <div className="relative flex items-center justify-between">
-            <div>
-                <p className="font-bold text-lg sm:text-xl mb-1">🎉 20% OFF Cleaning Services!</p>
-                <p className="text-sm sm:text-base text-emerald-50 opacity-90">Use code <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-bold text-white">CLEAN20</span> at checkout</p>
+const OfferBanner: React.FC = () => {
+    const { location } = useGeolocation();
+    const isBetaUser = isLocationInBetaArea(location);
+
+    if (isBetaUser) {
+        return (
+            <div className={`
+                relative overflow-hidden
+                bg-gradient-to-r ${BETA_OFFER_DETAILS.color}
+                text-white p-4 sm:p-6 mb-8 rounded-2xl shadow-lg shadow-pink-500/20
+                transform hover:scale-[1.02] transition-transform duration-300
+                animate-fade-in
+            `}>
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-black/10 rounded-full blur-xl"></div>
+
+                <div className="relative flex items-center justify-between">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-2xl">{BETA_OFFER_DETAILS.icon}</span>
+                            <p className="font-bold text-lg sm:text-xl">{BETA_OFFER_DETAILS.title}</p>
+                        </div>
+                        <p className="text-sm sm:text-base text-pink-50 opacity-90 mb-1">{BETA_OFFER_DETAILS.description}</p>
+                        <p className="text-xs bg-white/20 inline-block px-2 py-1 rounded font-mono">
+                            Code: <span className="font-bold">{BETA_OFFER_DETAILS.code}</span>
+                        </p>
+                    </div>
+                    <div className="hidden sm:block text-4xl animate-pulse">🎁</div>
+                </div>
             </div>
-            <div className="hidden sm:block text-4xl animate-bounce">✨</div>
+        );
+    }
+
+    // Default Offer
+    return (
+        <div className="
+            relative overflow-hidden
+            bg-gradient-to-r from-emerald-500 to-teal-600 
+            text-white p-4 sm:p-6 mb-8 rounded-2xl shadow-lg shadow-emerald-500/20
+            transform hover:scale-[1.02] transition-transform duration-300
+        ">
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-black/10 rounded-full blur-xl"></div>
+
+            <div className="relative flex items-center justify-between">
+                <div>
+                    <p className="font-bold text-lg sm:text-xl mb-1">🎉 20% OFF Cleaning Services!</p>
+                    <p className="text-sm sm:text-base text-emerald-50 opacity-90">Use code <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-bold text-white">CLEAN20</span> at checkout</p>
+                </div>
+                <div className="hidden sm:block text-4xl animate-bounce">✨</div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
