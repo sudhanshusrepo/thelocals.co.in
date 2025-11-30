@@ -50,23 +50,24 @@ export const HomePage: React.FC = () => {
 
             {/* Service Groups Grid - 3 columns × 2 rows */}
             <div className="w-full px-2 sm:px-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {Object.values(SERVICE_GROUPS).map((group) => (
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                    {Object.values(SERVICE_GROUPS).slice(0, 6).map((group) => (
                         <button
                             key={group.name}
                             data-testid="category-card"
                             onClick={() => navigate(`/group/${encodeURIComponent(group.name)}`)}
                             className={`
-                                relative flex flex-col items-center p-3 sm:p-6
+                                relative flex flex-col items-center p-2 sm:p-6
                                 bg-white dark:bg-slate-800
-                                rounded-2xl
-                                shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]
+                                rounded-xl sm:rounded-2xl
+                                shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]
                                 border border-slate-100 dark:border-slate-700
                                 transition-all duration-300 
                                 transform hover:-translate-y-1 hover:scale-[1.02] 
-                                hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
+                                hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
                                 hover:border-teal-100 dark:hover:border-teal-900/50
                                 group overflow-hidden
+                                min-h-[100px] sm:min-h-[160px] justify-center
                             `}
                         >
                             {/* Background Gradient Hover Effect */}
@@ -78,9 +79,9 @@ export const HomePage: React.FC = () => {
                             {/* Icon Container */}
                             <div className={`
                                 relative z-10
-                                w-14 h-14 sm:w-20 sm:h-20 rounded-full 
+                                w-10 h-10 sm:w-20 sm:h-20 rounded-full 
                                 flex items-center justify-center 
-                                text-2xl sm:text-4xl mb-3 sm:mb-4 
+                                text-xl sm:text-4xl mb-2 sm:mb-4 
                                 bg-${group.color}-50 dark:bg-${group.color}-900/20 
                                 text-${group.color}-600 dark:text-${group.color}-400
                                 group-hover:scale-110 group-hover:rotate-3 
@@ -91,20 +92,21 @@ export const HomePage: React.FC = () => {
                             </div>
 
                             {/* Text Content */}
-                            <div className="relative z-10 text-center">
-                                <h3 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-tight">
+                            <div className="relative z-10 text-center w-full">
+                                <h3 className="text-[10px] sm:text-lg font-bold text-slate-900 dark:text-white mb-0 sm:mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-tight px-0.5 break-words">
                                     {group.name}
                                 </h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 px-1 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                                <p className="hidden sm:block text-xs text-slate-500 dark:text-slate-400 line-clamp-2 px-1 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
                                     {group.helperText}
                                 </p>
                             </div>
 
-                            {/* Action Arrow (Visible on Hover) */}
+                            {/* Action Arrow (Visible on Hover - Desktop only) */}
                             <div className="
+                                hidden sm:flex
                                 absolute bottom-2 right-2 
                                 w-6 h-6 rounded-full bg-teal-50 dark:bg-teal-900/30 
-                                flex items-center justify-center text-teal-600 dark:text-teal-400
+                                items-center justify-center text-teal-600 dark:text-teal-400
                                 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 
                                 transition-all duration-300 delay-100 text-xs
                             ">
