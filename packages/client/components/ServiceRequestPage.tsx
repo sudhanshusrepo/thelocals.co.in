@@ -11,6 +11,7 @@ import { StickyChatCta } from './StickyChatCta';
 import { mediaUploadService } from '../services/mediaUploadService';
 import { AuthModal } from './AuthModal';
 import { useToast } from '../contexts/ToastContext';
+import { ProcessingAnimation } from './ProcessingAnimation';
 
 export const ServiceRequestPage: React.FC = () => {
     const { category } = useParams<{ category: string }>();
@@ -328,10 +329,10 @@ export const ServiceRequestPage: React.FC = () => {
 
                 {/* Loading Overlay */}
                 {isLoading && (
-                    <div className="fixed inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
-                        <p className="text-lg font-bold text-slate-800 dark:text-white animate-pulse">{statusMessage}</p>
-                    </div>
+                    <ProcessingAnimation
+                        message={statusMessage}
+                        subMessage="Connecting with local experts"
+                    />
                 )}
             </div>
 

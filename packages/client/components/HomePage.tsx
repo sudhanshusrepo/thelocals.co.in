@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { SERVICE_GROUPS } from '../constants';
 import { HowItWorks } from './HowItWorks';
@@ -90,20 +91,21 @@ export const HomePage: React.FC = () => {
             <div className="w-full px-2 sm:px-4">
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     {Object.values(SERVICE_GROUPS).slice(0, 6).map((group) => (
-                        <button
+                        <motion.button
                             key={group.name}
                             data-testid="category-card"
                             onClick={() => navigate(`/group/${encodeURIComponent(group.name)}`)}
+                            whileHover={{ scale: 1.05, y: -5 }}
+                            whileTap={{ scale: 0.95 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
                             className={`
                                 relative flex flex-col items-center p-2 sm:p-6
                                 bg-white dark:bg-slate-800
                                 rounded-xl sm:rounded-2xl
                                 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]
                                 border border-slate-100 dark:border-slate-700
-                                transition-all duration-300 
-                                transform hover:-translate-y-1 hover:scale-[1.02] 
-                                hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
-                                hover:border-teal-100 dark:hover:border-teal-900/50
                                 group overflow-hidden
                                 min-h-[100px] sm:min-h-[160px] justify-center
                             `}
@@ -150,7 +152,7 @@ export const HomePage: React.FC = () => {
                             ">
                                 →
                             </div>
-                        </button>
+                        </motion.button>
                     ))}
                 </div>
             </div>
