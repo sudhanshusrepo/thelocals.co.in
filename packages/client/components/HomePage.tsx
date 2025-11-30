@@ -7,19 +7,30 @@ import { Features } from './Features';
 import { StickyChatCta } from './StickyChatCta';
 
 const OfferBanner: React.FC = () => (
-    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 sm:p-4 mb-4 rounded-md shadow-md">
-        <p className="font-bold text-sm sm:text-base">20% off cleaning services!</p>
-        <p className="text-xs sm:text-sm">Use code CLEAN20 at checkout.</p>
+    <div className="
+        relative overflow-hidden
+        bg-gradient-to-r from-emerald-500 to-teal-600 
+        text-white p-4 sm:p-6 mb-8 rounded-2xl shadow-lg shadow-emerald-500/20
+        transform hover:scale-[1.02] transition-transform duration-300
+    ">
+        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-black/10 rounded-full blur-xl"></div>
+
+        <div className="relative flex items-center justify-between">
+            <div>
+                <p className="font-bold text-lg sm:text-xl mb-1">🎉 20% OFF Cleaning Services!</p>
+                <p className="text-sm sm:text-base text-emerald-50 opacity-90">Use code <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-bold text-white">CLEAN20</span> at checkout</p>
+            </div>
+            <div className="hidden sm:block text-4xl animate-bounce">✨</div>
+        </div>
     </div>
 );
-
-
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="space-y-6 animate-fade-in-up">
+        <div className="space-y-8 animate-fade-in-up pb-24">
             <Helmet>
                 <title>thelokals.com - AI-Powered Local Service Booking</title>
                 <meta name="description" content="Find and book trusted local professionals instantly with thelokals.com. Our AI-powered platform matches you with top-rated cleaners, plumbers, electricians, and more in your area." />
@@ -27,55 +38,93 @@ export const HomePage: React.FC = () => {
                 <link rel="canonical" href="https://thelokals.com/" />
             </Helmet>
 
-            {/* Service Groups Grid - 3 per row with larger cards */}
-            <div className="px-2">
-                <div className="grid grid-cols-3 gap-4 sm:gap-6">
+            {/* Hero Section - Subtle & Clean */}
+            <div className="text-center py-8 px-4 max-w-3xl mx-auto">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">
+                    Your Local Experts, <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">Instantly.</span>
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                    Select a category below or ask our AI to find the perfect professional for your needs.
+                </p>
+            </div>
+
+            {/* Service Groups Grid */}
+            <div className="px-4 max-w-7xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-8">
                     {Object.values(SERVICE_GROUPS).map((group) => (
                         <button
                             key={group.name}
                             data-testid="category-card"
                             onClick={() => navigate(`/group/${encodeURIComponent(group.name)}`)}
                             className={`
-                                relative flex flex-col items-center p-4 sm:p-6 
-                                bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20
-                                rounded-2xl 
-                                shadow-[0_8px_30px_rgb(34,197,94,0.12)] dark:shadow-[0_8px_30px_rgb(34,197,94,0.08)]
-                                border border-green-100/50 dark:border-green-800/30
-                                backdrop-blur-sm
+                                relative flex flex-col items-center p-6 sm:p-8
+                                bg-white dark:bg-slate-800
+                                rounded-3xl
+                                shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]
+                                border border-slate-100 dark:border-slate-700
                                 transition-all duration-300 
-                                transform hover:-translate-y-2 hover:scale-105 hover:shadow-[0_12px_40px_rgb(34,197,94,0.18)]
-                                group
+                                transform hover:-translate-y-2 hover:scale-[1.02] 
+                                hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]
+                                hover:border-teal-100 dark:hover:border-teal-900/50
+                                group overflow-hidden
                             `}
-                            style={{ transform: 'perspective(1000px) rotateX(0.5deg)' }}
                         >
-                            <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-3 sm:mb-4 bg-${group.color}-100 dark:bg-${group.color}-900/30 group-hover:scale-110 transition-transform`}>
+                            {/* Background Gradient Hover Effect */}
+                            <div className={`
+                                absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                                bg-gradient-to-br from-${group.color}-50/50 to-transparent dark:from-${group.color}-900/10
+                            `}></div>
+
+                            {/* Icon Container */}
+                            <div className={`
+                                relative z-10
+                                w-20 h-20 sm:w-24 sm:h-24 rounded-full 
+                                flex items-center justify-center 
+                                text-4xl sm:text-5xl mb-6 
+                                bg-${group.color}-50 dark:bg-${group.color}-900/20 
+                                text-${group.color}-600 dark:text-${group.color}-400
+                                group-hover:scale-110 group-hover:rotate-3 
+                                transition-all duration-300 ease-out
+                                shadow-sm group-hover:shadow-md
+                            `}>
                                 {group.icon}
                             </div>
-                            <h3 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white mb-1 sm:mb-2 group-hover:text-teal-600 transition-colors text-center leading-tight">
-                                {group.name}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 text-center hidden sm:block line-clamp-2">
-                                {group.helperText}
-                            </p>
+
+                            {/* Text Content */}
+                            <div className="relative z-10 text-center">
+                                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                    {group.name}
+                                </h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 px-2 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                                    {group.helperText}
+                                </p>
+                            </div>
+
+                            {/* Action Arrow (Visible on Hover) */}
+                            <div className="
+                                absolute bottom-4 right-4 
+                                w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-900/30 
+                                flex items-center justify-center text-teal-600 dark:text-teal-400
+                                opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 
+                                transition-all duration-300 delay-100
+                            ">
+                                →
+                            </div>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Hero Section - Moved below and made subtle */}
-            <div className="text-center py-4 px-4">
-                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium">
-                    Select a category to get started with our AI-powered booking
-                </p>
-            </div>
-
-            <div className="py-4 sm:py-8 px-4">
-                <HowItWorks />
-                <div className="my-6 sm:my-8">
-                    <OfferBanner />
+            <div className="py-8 px-4 max-w-7xl mx-auto">
+                <div className="mb-12">
+                    <HowItWorks />
                 </div>
+
+                <OfferBanner />
+
                 <Features />
             </div>
+
             <StickyChatCta />
         </div>
     );
