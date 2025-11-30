@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../../core/services/supabase';
+import { AuthLayout, AuthField, AuthButton, AuthOAuthButton, AuthDivider } from '@core/components/auth';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -74,72 +74,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" data-testid="auth-modal">
-      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <div className="p-8">
-          <div>
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
-                {isLogin ? 'Enter your details to sign in' : 'Join thelokals to connect with experts'}
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <button onClick={() => handleOAuthLogin('google')} className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google logo" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Continue with Google</span>
-              </button>
-            </div>
-
-            <div className="flex items-center my-6">
-              <hr className="flex-grow border-slate-200 dark:border-slate-600" />
-              <span className="mx-4 text-sm text-slate-400 dark:text-slate-500">OR</span>
-              <hr className="flex-grow border-slate-200 dark:border-slate-600" />
-            </div>
-
-            <form onSubmit={handleAuth} className="space-y-4">
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
-                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="John Doe" />
-                </div>
-              )}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} data-testid="email-input" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="john@example.com" />
-              </div>
-              <div>
-                <div className="flex justify-between items-end">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
-                </div>
-                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} data-testid="password-input" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" placeholder="••••••••" minLength={6} />
-                <p className="text-xs text-slate-500 mt-2">Password must be at least 6 characters long.</p>
-              </div>
-              <button type="submit" disabled={loading} data-testid="submit-button" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-teal-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2">
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</span>
-                ) : (isLogin ? 'Sign In' : 'Sign Up')}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-                <button onClick={() => { setIsLogin(!isLogin); }} data-testid="toggle-auth-mode" className="text-teal-600 dark:text-teal-400 font-semibold hover:text-teal-700 dark:hover:text-teal-300">
-                  {isLogin ? 'Sign up' : 'Sign in'}
-                </button>
-              </p>
-            </div>
-          </div>
-        </div>
+    <AuthLayout
+      onClose={onClose}
+      title={isLogin ? 'Welcome Back' : 'Create Account'}
+      subtitle={isLogin ? 'Enter your details to sign in' : 'Join thelokals to connect with experts'}
+    >
+      <div className="space-y-4">
+        <AuthOAuthButton
+          onClick={() => handleOAuthLogin('google')}
+          provider="google"
+          label="Continue with Google"
+        />
       </div>
-    </div>
+
+      <AuthDivider />
+
+      <form onSubmit={handleAuth} className="space-y-4">
+        {!isLogin && (
+          <AuthField
+            label="Full Name"
+            type="text"
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="John Doe"
+          />
+        )}
+        <AuthField
+          label="Email Address"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          data-testid="email-input"
+          placeholder="john@example.com"
+        />
+        <AuthField
+          label="Password"
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          data-testid="password-input"
+          placeholder="••••••••"
+          minLength={6}
+          helperText="Password must be at least 6 characters long."
+        />
+        <AuthButton loading={loading} data-testid="submit-button">
+          {isLogin ? 'Sign In' : 'Sign Up'}
+        </AuthButton>
+      </form>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+          <button onClick={() => { setIsLogin(!isLogin); }} data-testid="toggle-auth-mode" className="text-teal-600 dark:text-teal-400 font-semibold hover:text-teal-700 dark:hover:text-teal-300">
+            {isLogin ? 'Sign up' : 'Sign in'}
+          </button>
+        </p>
+      </div>
+    </AuthLayout>
   );
 };

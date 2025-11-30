@@ -43,10 +43,19 @@ const DashboardPage: React.FC<{ isLoading: boolean }> = ({ isLoading }) => {
     const { user } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
 
-    // Capitalize the view parameter to match DashboardView type
-    const capitalizedView = view
-        ? (view.charAt(0).toUpperCase() + view.slice(1)) as DashboardView
-        : 'Bookings';
+    // Map URL params to DashboardView types
+    let capitalizedView: DashboardView = 'Bookings';
+
+    if (view) {
+        const lowerView = view.toLowerCase();
+        if (lowerView === 'terms') {
+            capitalizedView = 'Terms & Conditions';
+        } else if (lowerView === 'privacy') {
+            capitalizedView = 'Privacy Policy';
+        } else {
+            capitalizedView = (view.charAt(0).toUpperCase() + view.slice(1)) as DashboardView;
+        }
+    }
 
     if (isLoading) {
         return capitalizedView === 'Bookings' ? <BookingSkeleton /> : <ProfileSkeleton />;
@@ -167,7 +176,12 @@ const MainLayout: React.FC = () => {
                     onSearch={() => { /* Not implemented for AI flow */ }}
                 />
 
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <main
+                    className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+                    style={{
+                        paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)',
+                    }}
+                >
                     {isLoading ? <HomeSkeleton /> : (
                         <Suspense fallback={<HomeSkeleton />}>
                             <Routes>

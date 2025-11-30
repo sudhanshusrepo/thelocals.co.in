@@ -56,11 +56,19 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm" role="banner">
+      <header
+        className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm"
+        role="banner"
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center justify-between min-h-[56px] sm:min-h-[64px] py-2">
 
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 min-w-[80px] sm:min-w-[120px]">
               {!isHome ? (
                 <Link
                   to="/"
@@ -80,13 +88,13 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            <div className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none sm:pointer-events-auto">
-              <h1 className={`font-semibold text-slate-800 dark:text-white transition-opacity duration-300 text-sm sm:text-base ${isHome ? 'opacity-0' : 'opacity-100'}`}>
+            <div className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none sm:pointer-events-auto max-w-[40%] sm:max-w-none px-2">
+              <h1 className={`font-semibold text-slate-800 dark:text-white transition-opacity duration-300 text-sm sm:text-base truncate ${isHome ? 'opacity-0' : 'opacity-100'}`}>
                 {title}
               </h1>
             </div>
 
-            <nav className="flex items-center gap-2 sm:gap-4" aria-label="Main Navigation">
+            <nav className="flex items-center gap-2 sm:gap-4 min-w-[80px] sm:min-w-[120px] justify-end" aria-label="Main Navigation">
               <button
                 onClick={() => setIsSearchVisible(true)}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"

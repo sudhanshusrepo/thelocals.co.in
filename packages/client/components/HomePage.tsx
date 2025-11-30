@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { SERVICE_GROUPS } from '../constants';
-import { HowItWorks } from './HowItWorks';
+// import { HowItWorks } from './HowItWorks';
 import { Features } from './Features';
 import { StickyChatCta } from './StickyChatCta';
 
@@ -88,8 +88,8 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Service Groups Grid - 3 columns × 2 rows */}
-            <div className="w-full px-2 sm:px-4">
-                <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="w-full px-0">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
                     {Object.values(SERVICE_GROUPS).slice(0, 6).map((group) => (
                         <motion.button
                             key={group.name}
@@ -107,7 +107,7 @@ export const HomePage: React.FC = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                             className={`
-                                relative flex flex-col items-center p-2 sm:p-6
+                                relative flex flex-col items-center p-3 sm:p-6
                                 bg-white dark:bg-slate-800
                                 rounded-xl sm:rounded-2xl
                                 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]
@@ -115,7 +115,7 @@ export const HomePage: React.FC = () => {
                                 border border-slate-100 dark:border-slate-700
                                 hover:border-teal-500/50 dark:hover:border-teal-400/50
                                 group overflow-hidden
-                                min-h-[100px] sm:min-h-[160px] justify-center
+                                min-h-[120px] sm:min-h-[180px] justify-center
                                 transform-gpu perspective-1000
                             `}
                         >
@@ -167,9 +167,9 @@ export const HomePage: React.FC = () => {
             </div>
 
             <div className="py-8 px-4 max-w-7xl mx-auto">
-                <div className="mb-12">
+                {/* <div className="mb-12">
                     <HowItWorks />
-                </div>
+                </div> */}
 
                 <OfferBanner />
 

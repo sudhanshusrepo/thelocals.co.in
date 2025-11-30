@@ -152,7 +152,12 @@ const MainLayout: React.FC = () => {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+        style={{
+          paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)',
+        }}
+      >
         <Suspense fallback={<LoadingSkeleton />}>
           <Routes>
             {/* Public landing page */}

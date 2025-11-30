@@ -102,9 +102,7 @@ export const Support: React.FC = () => {
               </a>
               <span className="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
               <a
-                href="https://thelokals.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/dashboard/privacy"
                 className="text-teal-600 dark:text-teal-400 font-semibold hover:underline flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

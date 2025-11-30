@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../core/services/supabase';
 import { bookingService } from '../../core/services/bookingService';
@@ -7,11 +6,12 @@ import { ReviewModal } from './ReviewModal';
 import { PaymentModal } from './PaymentModal';
 import { Profile } from './Profile';
 import { TermsAndConditions } from './TermsAndConditions';
+import { PrivacyPolicy } from './PrivacyPolicy';
 import { Support } from './Support';
 import { User } from '@supabase/supabase-js';
 import { ICONS } from '../constants';
 
-export type DashboardView = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Support';
+export type DashboardView = 'Bookings' | 'Profile' | 'Terms & Conditions' | 'Privacy Policy' | 'Support';
 type Tab = 'Upcoming' | 'Active' | 'Past';
 
 interface UserDashboardProps {
@@ -192,6 +192,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ initialView = 'Boo
       {initialView === 'Bookings' && renderBookingsView()}
       {initialView === 'Profile' && <Profile />}
       {initialView === 'Terms & Conditions' && <TermsAndConditions />}
+      {initialView === 'Privacy Policy' && <PrivacyPolicy />}
       {initialView === 'Support' && <Support />}
 
       {/* Modals remain at this level to be displayed over the content */}
